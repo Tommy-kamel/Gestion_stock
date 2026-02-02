@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Demandes d'achat</h1>
         <p class="mt-1 text-sm text-gray-500">Gestion des demandes d'achat internes</p>
       </div>
-      <button @click="showCreateModal = true" class="mt-4 sm:mt-0 btn-primary">
+      <button @click="showCreateModal = true" class="btn-primary">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
@@ -16,7 +16,7 @@
 
     <!-- Filtres -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Rechercher</label>
           <input v-model="filters.search" type="text" placeholder="N° DA, article..." 
@@ -35,10 +35,31 @@
           </select>
         </div>
         <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Entreprise</label>
+          <select v-model="filters.entreprise" class="w-full border-gray-300 rounded-lg">
+            <option value="">Toutes</option>
+            <option v-for="ent in entreprises" :key="ent.id" :value="ent.id">{{ ent.nom }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Site</label>
+          <select v-model="filters.site" class="w-full border-gray-300 rounded-lg">
+            <option value="">Tous</option>
+            <option v-for="site in sites" :key="site.id" :value="site.id">{{ site.nom }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt</label>
+          <select v-model="filters.depot" class="w-full border-gray-300 rounded-lg">
+            <option value="">Tous</option>
+            <option v-for="depot in depots" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
+          </select>
+        </div>
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Date début</label>
           <input v-model="filters.dateDebut" type="date" class="w-full border-gray-300 rounded-lg">
         </div>
-        <div>
+        <div class="md:col-span-3 lg:col-span-1">
           <label class="block text-sm font-medium text-gray-700 mb-1">Date fin</label>
           <input v-model="filters.dateFin" type="date" class="w-full border-gray-300 rounded-lg">
         </div>
@@ -117,10 +138,24 @@
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Nouvelle demande d'achat</h3>
           
           <form @submit.prevent="creerDemande" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Entreprise</label>
+                <select v-model="newDemande.entrepriseId" required class="w-full border-gray-300 rounded-lg">
+                  <option value="">Sélectionner</option>
+                  <option v-for="ent in entreprises" :key="ent.id" :value="ent.id">{{ ent.nom }}</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Site</label>
+                <select v-model="newDemande.siteId" required class="w-full border-gray-300 rounded-lg">
+                  <option value="">Sélectionner</option>
+                  <option v-for="site in sites" :key="site.id" :value="site.id">{{ site.nom }}</option>
+                </select>
+              </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt cible</label>
-                <select v-model="newDemande.depotCibleId" required class="w-full border-gray-300 rounded-lg">
+                <select v-model="newDemande.depotId" required class="w-full border-gray-300 rounded-lg">
                   <option value="">Sélectionner</option>
                   <option v-for="depot in depots" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
                 </select>
@@ -237,6 +272,8 @@ const authStore = useAuthStore()
 const demandes = ref([])
 const depots = ref([])
 const articles = ref([])
+const entreprises = ref([])
+const sites = ref([])
 
 const showCreateModal = ref(false)
 const showDetailsModal = ref(false)
@@ -246,11 +283,16 @@ const filters = reactive({
   search: '',
   statut: '',
   dateDebut: '',
-  dateFin: ''
+  dateFin: '',
+  entreprise: '',
+  site: '',
+  depot: ''
 })
 
 const newDemande = reactive({
-  depotCibleId: '',
+  entrepriseId: '',
+  siteId: '',
+  depotId: '',
   dateDemande: new Date().toISOString().split('T')[0],
   observations: '',
   details: [{ articleId: '', quantite: 1 }]
@@ -263,6 +305,9 @@ const filteredDemandes = computed(() => {
       if (!da.numeroDa?.toLowerCase().includes(search)) return false
     }
     if (filters.statut && da.statut?.code !== filters.statut) return false
+    if (filters.entreprise && da.entreprise?.id != filters.entreprise) return false
+    if (filters.site && da.site?.id != filters.site) return false
+    if (filters.depot && da.depotCible?.id != filters.depot) return false
     return true
   })
 })
@@ -304,8 +349,9 @@ const creerDemande = async () => {
   try {
     const data = {
       dateDemande: newDemande.dateDemande,
-      entrepriseId: authStore.user?.entreprise?.id || 1,
-      depotCibleId: newDemande.depotCibleId,
+      entrepriseId: newDemande.entrepriseId,
+      siteId: newDemande.siteId,
+      depotCibleId: newDemande.depotId,
       demandeurId: authStore.user?.id || 1,
       observations: newDemande.observations,
       details: newDemande.details.filter(d => d.articleId)
@@ -314,7 +360,9 @@ const creerDemande = async () => {
     showCreateModal.value = false
     loadDemandes()
     // Reset form
-    newDemande.depotCibleId = ''
+    newDemande.entrepriseId = ''
+    newDemande.siteId = ''
+    newDemande.depotId = ''
     newDemande.observations = ''
     newDemande.details = [{ articleId: '', quantite: 1 }]
   } catch (error) {
@@ -381,18 +429,37 @@ const loadArticles = async () => {
   }
 }
 
+const loadEntreprises = async () => {
+  try {
+    const response = await referenceApi.getEntreprises()
+    entreprises.value = response.data || []
+  } catch (error) {
+    console.error('Erreur chargement entreprises:', error)
+    entreprises.value = [
+      { id: 1, nom: 'Entreprise 1' },
+      { id: 2, nom: 'Entreprise 2' }
+    ]
+  }
+}
+
+const loadSites = async () => {
+  try {
+    const response = await referenceApi.getSites()
+    sites.value = response.data || []
+  } catch (error) {
+    console.error('Erreur chargement sites:', error)
+    sites.value = [
+      { id: 1, nom: 'Site Central' },
+      { id: 2, nom: 'Site Secondaire' }
+    ]
+  }
+}
+
 onMounted(() => {
   loadDemandes()
   loadDepots()
   loadArticles()
+  loadEntreprises()
+  loadSites()
 })
 </script>
-
-<style scoped>
-.btn-primary {
-  @apply inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors;
-}
-.btn-secondary {
-  @apply inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors;
-}
-</style>
