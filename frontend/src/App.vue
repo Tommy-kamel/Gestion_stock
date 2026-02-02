@@ -351,3 +351,29 @@ watch(() => route.path, () => {
   userMenuOpen.value = false
 })
 </script>
+
+<style>
+/* Navigation links */
+.nav-link {
+  @apply flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-700 hover:text-white transition-colors;
+}
+.nav-link.active {
+  @apply bg-indigo-600 text-white;
+}
+.nav-link svg {
+  @apply mr-3;
+}
+
+/* Section headers (collapsible) */
+.nav-section-header {
+  @apply w-full flex items-center justify-between px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-700 hover:text-white transition-colors;
+}
+
+/* Sub links */
+.nav-sublink {
+  @apply block px-3 py-2 text-sm text-slate-400 rounded-lg hover:bg-slate-700 hover:text-white transition-colors;
+}
+.nav-sublink.active {
+  @apply bg-slate-700 text-indigo-400;
+}
+</style>

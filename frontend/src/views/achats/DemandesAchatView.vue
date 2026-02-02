@@ -6,7 +6,7 @@
         <h1 class="text-2xl font-bold text-gray-900">Demandes d'achat</h1>
         <p class="mt-1 text-sm text-gray-500">Gestion des demandes d'achat internes</p>
       </div>
-      <button @click="showCreateModal = true" class="btn-primary">
+      <button @click="showCreateModal = true" class="mt-4 sm:mt-0 btn-primary">
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
@@ -16,7 +16,7 @@
 
     <!-- Filtres -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Rechercher</label>
           <input v-model="filters.search" type="text" placeholder="N° DA, article..." 
@@ -35,31 +35,10 @@
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Entreprise</label>
-          <select v-model="filters.entreprise" class="w-full border-gray-300 rounded-lg">
-            <option value="">Toutes</option>
-            <option v-for="ent in entreprises" :key="ent.id" :value="ent.id">{{ ent.nom }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Site</label>
-          <select v-model="filters.site" class="w-full border-gray-300 rounded-lg">
-            <option value="">Tous</option>
-            <option v-for="site in sites" :key="site.id" :value="site.id">{{ site.nom }}</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt</label>
-          <select v-model="filters.depot" class="w-full border-gray-300 rounded-lg">
-            <option value="">Tous</option>
-            <option v-for="depot in depots" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
-          </select>
-        </div>
-        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Date début</label>
           <input v-model="filters.dateDebut" type="date" class="w-full border-gray-300 rounded-lg">
         </div>
-        <div class="md:col-span-3 lg:col-span-1">
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Date fin</label>
           <input v-model="filters.dateFin" type="date" class="w-full border-gray-300 rounded-lg">
         </div>
@@ -138,12 +117,12 @@
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Nouvelle demande d'achat</h3>
           
           <form @submit.prevent="creerDemande" class="space-y-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="grid grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Entreprise</label>
                 <select v-model="newDemande.entrepriseId" required class="w-full border-gray-300 rounded-lg">
                   <option value="">Sélectionner</option>
-                  <option v-for="ent in entreprises" :key="ent.id" :value="ent.id">{{ ent.nom }}</option>
+                  <option v-for="entreprise in entreprises" :key="entreprise.id" :value="entreprise.id">{{ entreprise.nom }}</option>
                 </select>
               </div>
               <div>
@@ -155,15 +134,15 @@
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt cible</label>
-                <select v-model="newDemande.depotId" required class="w-full border-gray-300 rounded-lg">
+                <select v-model="newDemande.depotCibleId" required class="w-full border-gray-300 rounded-lg">
                   <option value="">Sélectionner</option>
                   <option v-for="depot in depots" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
                 </select>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date demande</label>
-                <input v-model="newDemande.dateDemande" type="date" required class="w-full border-gray-300 rounded-lg">
-              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date demande</label>
+              <input v-model="newDemande.dateDemande" type="date" required class="w-full border-gray-300 rounded-lg">
             </div>
 
             <div>
@@ -186,6 +165,8 @@
                     <option v-for="art in articles" :key="art.id" :value="art.id">{{ art.reference }} - {{ art.designation }}</option>
                   </select>
                   <input v-model.number="line.quantite" type="number" min="1" required placeholder="Qté" 
+                         class="w-20 border-gray-300 rounded-lg text-sm">
+                  <input v-model.number="line.prixUnitaire" type="number" min="0" step="0.01" required placeholder="Prix" 
                          class="w-24 border-gray-300 rounded-lg text-sm">
                   <button type="button" @click="removeArticleLine(index)" class="text-red-500 hover:text-red-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -283,19 +264,16 @@ const filters = reactive({
   search: '',
   statut: '',
   dateDebut: '',
-  dateFin: '',
-  entreprise: '',
-  site: '',
-  depot: ''
+  dateFin: ''
 })
 
 const newDemande = reactive({
   entrepriseId: '',
   siteId: '',
-  depotId: '',
+  depotCibleId: '',
   dateDemande: new Date().toISOString().split('T')[0],
   observations: '',
-  details: [{ articleId: '', quantite: 1 }]
+  details: [{ articleId: '', quantite: 1, prixUnitaire: 0 }]
 })
 
 const filteredDemandes = computed(() => {
@@ -305,9 +283,6 @@ const filteredDemandes = computed(() => {
       if (!da.numeroDa?.toLowerCase().includes(search)) return false
     }
     if (filters.statut && da.statut?.code !== filters.statut) return false
-    if (filters.entreprise && da.entreprise?.id != filters.entreprise) return false
-    if (filters.site && da.site?.id != filters.site) return false
-    if (filters.depot && da.depotCible?.id != filters.depot) return false
     return true
   })
 })
@@ -331,7 +306,7 @@ const getStatutClass = (code) => {
 }
 
 const addArticleLine = () => {
-  newDemande.details.push({ articleId: '', quantite: 1 })
+  newDemande.details.push({ articleId: '', quantite: 1, prixUnitaire: 0 })
 }
 
 const removeArticleLine = (index) => {
@@ -351,10 +326,14 @@ const creerDemande = async () => {
       dateDemande: newDemande.dateDemande,
       entrepriseId: newDemande.entrepriseId,
       siteId: newDemande.siteId,
-      depotCibleId: newDemande.depotId,
+      depotId: newDemande.depotCibleId,
       demandeurId: authStore.user?.id || 1,
-      observations: newDemande.observations,
-      details: newDemande.details.filter(d => d.articleId)
+      motifAchat: newDemande.observations,
+      details: newDemande.details.filter(d => d.articleId).map(d => ({
+        articleId: d.articleId,
+        quantiteDemandee: d.quantite,
+        prixUnitaire: d.prixUnitaire
+      }))
     }
     await achatApi.creerDemandeAchat(data)
     showCreateModal.value = false
@@ -362,9 +341,9 @@ const creerDemande = async () => {
     // Reset form
     newDemande.entrepriseId = ''
     newDemande.siteId = ''
-    newDemande.depotId = ''
+    newDemande.depotCibleId = ''
     newDemande.observations = ''
-    newDemande.details = [{ articleId: '', quantite: 1 }]
+    newDemande.details = [{ articleId: '', quantite: 1, prixUnitaire: 0 }]
   } catch (error) {
     console.error('Erreur création DA:', error)
     alert('Erreur lors de la création')
@@ -436,8 +415,7 @@ const loadEntreprises = async () => {
   } catch (error) {
     console.error('Erreur chargement entreprises:', error)
     entreprises.value = [
-      { id: 1, nom: 'Entreprise 1' },
-      { id: 2, nom: 'Entreprise 2' }
+      { id: 1, nom: 'Madagascar Distribution SARL' }
     ]
   }
 }
@@ -449,8 +427,7 @@ const loadSites = async () => {
   } catch (error) {
     console.error('Erreur chargement sites:', error)
     sites.value = [
-      { id: 1, nom: 'Site Central' },
-      { id: 2, nom: 'Site Secondaire' }
+      { id: 1, nom: 'Site Principal Tana' }
     ]
   }
 }
@@ -463,3 +440,12 @@ onMounted(() => {
   loadSites()
 })
 </script>
+
+<style scoped>
+.btn-primary {
+  @apply inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors;
+}
+.btn-secondary {
+  @apply inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors;
+}
+</style>

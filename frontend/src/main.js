@@ -5,9 +5,15 @@ import router from './router'
 import './assets/main.css'
 
 const app = createApp(App)
-const pinia = createPinia()
 
-app.use(pinia)
+// Error handler pour debug
+app.config.errorHandler = (err, instance, info) => {
+  console.error('Vue Error:', err)
+  console.error('Component:', instance)
+  console.error('Info:', info)
+}
+
+app.use(createPinia())
 app.use(router)
 
 app.mount('#app')

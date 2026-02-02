@@ -35,4 +35,8 @@ public class DemandeAchatService {
     public boolean existsById(Long id) {
         return demandeAchatRepository.existsById(id);
     }
+
+    public long count() {
+        return demandeAchatRepository.count();
+    }
 }

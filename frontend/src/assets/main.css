@@ -178,35 +178,3 @@ tbody tr:hover {
 .kpi-trend-down {
   @apply text-red-600;
 }
-
-/* Navigation links */
-.nav-link {
-  @apply flex items-center px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-700 hover:text-white transition-colors;
-}
-.nav-link.active {
-  @apply bg-indigo-600 text-white;
-}
-.nav-link svg {
-  @apply mr-3;
-}
-
-/* Section headers (collapsible) */
-.nav-section-header {
-  @apply w-full flex items-center justify-between px-3 py-2.5 text-slate-300 rounded-lg hover:bg-slate-700 hover:text-white transition-colors;
-}
-
-/* Sub links */
-.nav-sublink {
-  @apply block px-3 py-2 text-sm text-slate-400 rounded-lg hover:bg-slate-700 hover:text-white transition-colors;
-}
-.nav-sublink.active {
-  @apply bg-slate-700 text-indigo-400;
-}
-
-/* Button styles */
-.btn-primary {
-  @apply inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors;
-}
-.btn-secondary {
-  @apply inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors;
-}

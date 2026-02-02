@@ -103,7 +103,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="font-medium text-gray-900">Super Admin</p>
-                  <p class="text-sm text-gray-500">admin@mad-distrib.mg / admin123</p>
+                  <p class="text-sm text-gray-500">admin / admin</p>
                 </div>
                 <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full">
                   Accès complet
@@ -146,10 +146,7 @@ const handleLogin = async () => {
   loading.value = true
   
   try {
-    const result = await authStore.login({
-      username: username.value,
-      password: password.value
-    })
+    const result = await authStore.login(username.value, password.value)
     
     if (result.success) {
       router.push('/')

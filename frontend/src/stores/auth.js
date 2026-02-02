@@ -1,75 +1,74 @@
 import { defineStore } from 'pinia'
-import { authApi } from '@/services/api'
+import api from '@/services/api'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
-    user: null,
-    token: null,
-    isAuthenticated: false
+    user: JSON.parse(localStorage.getItem('user')) || null,
+    token: localStorage.getItem('token') || null,
+    loading: false,
+    error: null
   }),
 
   getters: {
-    isLoggedIn: (state) => state.isAuthenticated,
-    userRole: (state) => state.user?.role,
-    userEntreprise: (state) => state.user?.entreprise,
-    userName: (state) => state.user ? `${state.user.prenom || ''} ${state.user.nom || ''}`.trim() : '',
+    isAuthenticated: (state) => !!state.user,
+    
+    userName: (state) => {
+      if (!state.user) return ''
+      return state.user.nom || ''
+    },
+    
     userInitials: (state) => {
-      if (!state.user) return 'U'
-      const prenom = state.user.prenom || ''
+      if (!state.user) return '??'
       const nom = state.user.nom || ''
-      return (prenom.charAt(0) + nom.charAt(0)).toUpperCase() || 'U'
+      return nom[0] || '?'
+    },
+
+    // Pour l'instant, considérer l'utilisateur connecté comme super admin
+    isSuperAdmin: (state) => {
+      return !!state.user
     }
   },
 
   actions: {
-    async login(credentials) {
+    async login(username, password) {
+      this.loading = true
+      this.error = null
+      
       try {
-        const response = await authApi.login(credentials)
-        const { token, user } = response.data
-
-        this.token = token
-        this.user = user
-        this.isAuthenticated = true
-
-        localStorage.setItem('token', token)
-        localStorage.setItem('user', JSON.stringify(user))
-
+        const response = await api.post('/auth/login', { username, password })
+        
+        this.user = response.data.user
+        this.token = response.data.token
+        
+        localStorage.setItem('user', JSON.stringify(this.user))
+        localStorage.setItem('token', this.token)
+        
         return { success: true }
       } catch (error) {
-        console.error('Login error:', error)
-        return { success: false, error: error.response?.data?.error || 'Erreur de connexion' }
+        this.error = error.response?.data?.error || 'Erreur de connexion'
+        return { success: false, error: this.error }
+      } finally {
+        this.loading = false
       }
     },
-
-    async logout() {
+    
+    logout() {
       this.user = null
       this.token = null
-      this.isAuthenticated = false
-
-      localStorage.removeItem('token')
       localStorage.removeItem('user')
+      localStorage.removeItem('token')
     },
-
-    async checkAuth() {
-      const token = localStorage.getItem('token')
+    
+    checkAuth() {
       const user = localStorage.getItem('user')
-
-      if (token && user) {
-        this.token = token
+      const token = localStorage.getItem('token')
+      
+      if (user && token) {
         this.user = JSON.parse(user)
-        this.isAuthenticated = true
+        this.token = token
+        return true
       }
-    },
-
-    async getProfile() {
-      try {
-        const response = await authApi.getProfile()
-        this.user = response.data
-        localStorage.setItem('user', JSON.stringify(response.data))
-      } catch (error) {
-        console.error('Error fetching profile:', error)
-        this.logout()
-      }
+      return false
     }
   }
 })
