@@ -1,5 +1,6 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ public class DemandeAchatDetails {
 
     @ManyToOne
     @JoinColumn(name = "id_demande_achat", nullable = false)
+    @JsonIgnoreProperties("details")
     private DemandeAchat demandeAchat;
 
     @ManyToOne

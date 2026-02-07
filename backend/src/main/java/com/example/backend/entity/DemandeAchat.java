@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -43,4 +44,7 @@ public class DemandeAchat {
 
     @Column(name = "date_creation")
     private LocalDateTime dateCreation;
+
+    @OneToMany(mappedBy = "demandeAchat", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<DemandeAchatDetails> details;
 }

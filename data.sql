@@ -71,7 +71,7 @@ INSERT INTO site (nom, adresse, telephone, email, id_entreprise) VALUES
 -- ------------------------------------------------------------------------------
 INSERT INTO depot (nom, adresse, id_site, id_methode_valorisation_stock) VALUES
 ('Depot Principal A', '123 Rue de l''Industrie, Ville A', 1, 1),
-('Depot Secondaire A', '789 Boulevard Industriel, Ville A', 2, 1),
+('Depot Secondaire A', '789 Boulevard Industriel, Ville A', 2, 3),
 ('Depot Principal B', '456 Avenue du Commerce, Ville B', 3, 2);
 
 -- ------------------------------------------------------------------------------

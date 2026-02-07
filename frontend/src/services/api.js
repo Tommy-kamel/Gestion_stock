@@ -39,6 +39,7 @@ export const achatApi = {
   getDemandesAchat: () => api.get('/achats/demandes'),
   getDemandeAchat: (id) => api.get(`/achats/demandes/${id}`),
   creerDemandeAchat: (data) => api.post('/achats/demandes', data),
+  validerDemandeAchat: (id) => api.put(`/achats/demandes/${id}/valider`),
   soumettreDemandeAchat: (id) => api.post(`/achats/demandes/${id}/soumettre`),
   approuverDemandeAchat: (id, personnelId) => api.post(`/achats/demandes/${id}/approuver?personnelId=${personnelId}`),
   

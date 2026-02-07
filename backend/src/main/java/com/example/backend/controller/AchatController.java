@@ -199,6 +199,30 @@ public class AchatController {
         }
     }
 
+    @PutMapping("/demandes/{id}/valider")
+    public ResponseEntity<DemandeAchat> validerDemandeAchat(@PathVariable("id") Long id) {
+        try {
+            Optional<DemandeAchat> demandeAchatData = demandeAchatService.findById(id);
+            
+            if (demandeAchatData.isPresent()) {
+                DemandeAchat demandeAchat = demandeAchatData.get();
+                
+                // Update status to VALIDE
+                Status status = new Status();
+                status.setId(3L); // Assuming 3 is VALIDE
+                status.setCode("VALIDE");
+                status.setLibelle("Valide");
+                demandeAchat.setStatus(status);
+                
+                return ResponseEntity.ok(demandeAchatService.save(demandeAchat));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     // ==================== GESTION DES DÉTAILS DE DEMANDE D'ACHAT ====================
 
     @PostMapping("/demandes/{demandeId}/details")
