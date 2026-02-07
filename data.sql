@@ -5,6 +5,9 @@
 -- ------------------------------------------------------------------------------
 -- 1. STATUTS (À INSeRER)
 -- ------------------------------------------------------------------------------
+INSERT INTO utilisateur (nom, mdp) VALUES
+('admin', 'admin');
+
 INSERT INTO status (code, libelle, niveau) VALUES
 ('BROUILLON', 'Brouillon', 1),
 ('EN_COURS', 'En cours', 2),

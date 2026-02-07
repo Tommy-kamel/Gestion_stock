@@ -117,7 +117,21 @@
           <h3 class="text-lg font-semibold text-gray-900 mb-4">Nouvelle demande d'achat</h3>
           
           <form @submit.prevent="creerDemande" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Entreprise</label>
+                <select v-model="newDemande.entrepriseId" required class="w-full border-gray-300 rounded-lg">
+                  <option value="">Sélectionner</option>
+                  <option v-for="entreprise in entreprises" :key="entreprise.id" :value="entreprise.id">{{ entreprise.nom }}</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Site</label>
+                <select v-model="newDemande.siteId" required class="w-full border-gray-300 rounded-lg">
+                  <option value="">Sélectionner</option>
+                  <option v-for="site in sites" :key="site.id" :value="site.id">{{ site.nom }}</option>
+                </select>
+              </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt cible</label>
                 <select v-model="newDemande.depotCibleId" required class="w-full border-gray-300 rounded-lg">
@@ -125,10 +139,10 @@
                   <option v-for="depot in depots" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
                 </select>
               </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date demande</label>
-                <input v-model="newDemande.dateDemande" type="date" required class="w-full border-gray-300 rounded-lg">
-              </div>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date demande</label>
+              <input v-model="newDemande.dateDemande" type="date" required class="w-full border-gray-300 rounded-lg">
             </div>
 
             <div>
@@ -151,6 +165,8 @@
                     <option v-for="art in articles" :key="art.id" :value="art.id">{{ art.reference }} - {{ art.designation }}</option>
                   </select>
                   <input v-model.number="line.quantite" type="number" min="1" required placeholder="Qté" 
+                         class="w-20 border-gray-300 rounded-lg text-sm">
+                  <input v-model.number="line.prixUnitaire" type="number" min="0" step="0.01" required placeholder="Prix" 
                          class="w-24 border-gray-300 rounded-lg text-sm">
                   <button type="button" @click="removeArticleLine(index)" class="text-red-500 hover:text-red-700">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,6 +253,8 @@ const authStore = useAuthStore()
 const demandes = ref([])
 const depots = ref([])
 const articles = ref([])
+const entreprises = ref([])
+const sites = ref([])
 
 const showCreateModal = ref(false)
 const showDetailsModal = ref(false)
@@ -250,10 +268,12 @@ const filters = reactive({
 })
 
 const newDemande = reactive({
+  entrepriseId: '',
+  siteId: '',
   depotCibleId: '',
   dateDemande: new Date().toISOString().split('T')[0],
   observations: '',
-  details: [{ articleId: '', quantite: 1 }]
+  details: [{ articleId: '', quantite: 1, prixUnitaire: 0 }]
 })
 
 const filteredDemandes = computed(() => {
@@ -286,7 +306,7 @@ const getStatutClass = (code) => {
 }
 
 const addArticleLine = () => {
-  newDemande.details.push({ articleId: '', quantite: 1 })
+  newDemande.details.push({ articleId: '', quantite: 1, prixUnitaire: 0 })
 }
 
 const removeArticleLine = (index) => {
@@ -304,19 +324,26 @@ const creerDemande = async () => {
   try {
     const data = {
       dateDemande: newDemande.dateDemande,
-      entrepriseId: authStore.user?.entreprise?.id || 1,
-      depotCibleId: newDemande.depotCibleId,
+      entrepriseId: newDemande.entrepriseId,
+      siteId: newDemande.siteId,
+      depotId: newDemande.depotCibleId,
       demandeurId: authStore.user?.id || 1,
-      observations: newDemande.observations,
-      details: newDemande.details.filter(d => d.articleId)
+      motifAchat: newDemande.observations,
+      details: newDemande.details.filter(d => d.articleId).map(d => ({
+        articleId: d.articleId,
+        quantiteDemandee: d.quantite,
+        prixUnitaire: d.prixUnitaire
+      }))
     }
     await achatApi.creerDemandeAchat(data)
     showCreateModal.value = false
     loadDemandes()
     // Reset form
+    newDemande.entrepriseId = ''
+    newDemande.siteId = ''
     newDemande.depotCibleId = ''
     newDemande.observations = ''
-    newDemande.details = [{ articleId: '', quantite: 1 }]
+    newDemande.details = [{ articleId: '', quantite: 1, prixUnitaire: 0 }]
   } catch (error) {
     console.error('Erreur création DA:', error)
     alert('Erreur lors de la création')
@@ -381,10 +408,36 @@ const loadArticles = async () => {
   }
 }
 
+const loadEntreprises = async () => {
+  try {
+    const response = await referenceApi.getEntreprises()
+    entreprises.value = response.data || []
+  } catch (error) {
+    console.error('Erreur chargement entreprises:', error)
+    entreprises.value = [
+      { id: 1, nom: 'Madagascar Distribution SARL' }
+    ]
+  }
+}
+
+const loadSites = async () => {
+  try {
+    const response = await referenceApi.getSites()
+    sites.value = response.data || []
+  } catch (error) {
+    console.error('Erreur chargement sites:', error)
+    sites.value = [
+      { id: 1, nom: 'Site Principal Tana' }
+    ]
+  }
+}
+
 onMounted(() => {
   loadDemandes()
   loadDepots()
   loadArticles()
+  loadEntreprises()
+  loadSites()
 })
 </script>
 

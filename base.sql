@@ -3,6 +3,11 @@ DROP DATABASE IF EXISTS gestion_stock;
 CREATE DATABASE gestion_stock;
 \c gestion_stock;
 
+CREATE TABLE utilisateur ( /* Table des administrateurs */
+    id       SERIAL PRIMARY KEY,
+    nom VARCHAR(50) UNIQUE NOT NULL,
+    mdp VARCHAR(100) NOT NULL
+);
 
 CREATE TABLE status ( /* Tous les status */
     id      SERIAL PRIMARY KEY,
@@ -166,7 +171,7 @@ CREATE TABLE demande_achat (
     id_status             INTEGER NOT NULL,
     date_creation         TIMESTAMP DEFAULT NOW(),
     FOREIGN KEY (id_entreprise)         REFERENCES entreprise(id),
-    FOREIGN KEY (id_depot)        REFERENCES depot(id),
+    FOREIGN KEY (id_depot)        REFERENCES depot(id), 
     FOREIGN KEY (id_status)             REFERENCES status(id)
 );
 

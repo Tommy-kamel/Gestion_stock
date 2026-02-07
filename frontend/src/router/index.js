@@ -1,0 +1,228 @@
+import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
+
+// Lazy loading des composants
+const LoginView = () => import('@/views/LoginView.vue')
+const DashboardView = () => import('@/views/DashboardView.vue')
+
+// Achats
+const DemandesAchatView = () => import('@/views/achats/DemandesAchatView.vue')
+const ProformasAchatView = () => import('@/views/achats/ProformasAchatView.vue')
+const BonsCommandeAchatView = () => import('@/views/achats/BonsCommandeAchatView.vue')
+const BonsLivraisonAchatView = () => import('@/views/achats/BonsLivraisonAchatView.vue')
+const FacturesAchatView = () => import('@/views/achats/FacturesAchatView.vue')
+
+// Ventes
+const DemandesProformaView = () => import('@/views/ventes/DemandesProformaView.vue')
+const DevisVenteView = () => import('@/views/ventes/DevisVenteView.vue')
+const BonsCommandeVenteView = () => import('@/views/ventes/BonsCommandeVenteView.vue')
+const BonsLivraisonVenteView = () => import('@/views/ventes/BonsLivraisonVenteView.vue')
+const FacturesVenteView = () => import('@/views/ventes/FacturesVenteView.vue')
+
+// Stock
+const EtatStockView = () => import('@/views/stock/EtatStockView.vue')
+const ArticlesView = () => import('@/views/stock/ArticlesView.vue')
+const LotsView = () => import('@/views/stock/LotsView.vue')
+const MouvementsView = () => import('@/views/stock/MouvementsView.vue')
+const DepotsView = () => import('@/views/stock/DepotsView.vue')
+
+// Finances
+const ValidationFinanceView = () => import('@/views/finances/ValidationFinanceView.vue')
+const CaissesView = () => import('@/views/finances/CaissesView.vue')
+const PaiementsAchatView = () => import('@/views/finances/PaiementsAchatView.vue')
+const PaiementsVenteView = () => import('@/views/finances/PaiementsVenteView.vue')
+
+// Référentiel
+const EntreprisesView = () => import('@/views/referentiel/EntreprisesView.vue')
+const FournisseursView = () => import('@/views/referentiel/FournisseursView.vue')
+const ClientsView = () => import('@/views/referentiel/ClientsView.vue')
+const PersonnelView = () => import('@/views/referentiel/PersonnelView.vue')
+
+const routes = [
+  {
+    path: '/login',
+    name: 'login',
+    component: LoginView,
+    meta: { requiresAuth: false, title: 'Connexion' }
+  },
+  {
+    path: '/',
+    name: 'dashboard',
+    component: DashboardView,
+    meta: { requiresAuth: true, title: 'Tableau de bord' }
+  },
+  
+  // ===================== ACHATS =====================
+  {
+    path: '/achats/demandes',
+    name: 'demandes-achat',
+    component: DemandesAchatView,
+    meta: { requiresAuth: true, title: 'Demandes d\'achat' }
+  },
+  {
+    path: '/achats/proformas',
+    name: 'proformas-achat',
+    component: ProformasAchatView,
+    meta: { requiresAuth: true, title: 'Proformas fournisseurs' }
+  },
+  {
+    path: '/achats/bons-commande',
+    name: 'bons-commande-achat',
+    component: BonsCommandeAchatView,
+    meta: { requiresAuth: true, title: 'Bons de commande achat' }
+  },
+  {
+    path: '/achats/bons-livraison',
+    name: 'bons-livraison-achat',
+    component: BonsLivraisonAchatView,
+    meta: { requiresAuth: true, title: 'Bons de livraison achat' }
+  },
+  {
+    path: '/achats/factures',
+    name: 'factures-achat',
+    component: FacturesAchatView,
+    meta: { requiresAuth: true, title: 'Factures fournisseurs' }
+  },
+  
+  // ===================== VENTES =====================
+  {
+    path: '/ventes/demandes-proforma',
+    name: 'demandes-proforma',
+    component: DemandesProformaView,
+    meta: { requiresAuth: true, title: 'Demandes de proforma' }
+  },
+  {
+    path: '/ventes/devis',
+    name: 'devis-vente',
+    component: DevisVenteView,
+    meta: { requiresAuth: true, title: 'Devis / Proformas' }
+  },
+  {
+    path: '/ventes/bons-commande',
+    name: 'bons-commande-vente',
+    component: BonsCommandeVenteView,
+    meta: { requiresAuth: true, title: 'Bons de commande vente' }
+  },
+  {
+    path: '/ventes/bons-livraison',
+    name: 'bons-livraison-vente',
+    component: BonsLivraisonVenteView,
+    meta: { requiresAuth: true, title: 'Bons de livraison vente' }
+  },
+  {
+    path: '/ventes/factures',
+    name: 'factures-vente',
+    component: FacturesVenteView,
+    meta: { requiresAuth: true, title: 'Factures clients' }
+  },
+  
+  // ===================== STOCK =====================
+  {
+    path: '/stock/etat',
+    name: 'etat-stock',
+    component: EtatStockView,
+    meta: { requiresAuth: true, title: 'État des stocks' }
+  },
+  {
+    path: '/stock/articles',
+    name: 'articles',
+    component: ArticlesView,
+    meta: { requiresAuth: true, title: 'Articles' }
+  },
+  {
+    path: '/stock/lots',
+    name: 'lots',
+    component: LotsView,
+    meta: { requiresAuth: true, title: 'Gestion des lots' }
+  },
+  {
+    path: '/stock/mouvements',
+    name: 'mouvements',
+    component: MouvementsView,
+    meta: { requiresAuth: true, title: 'Mouvements de stock' }
+  },
+  {
+    path: '/stock/depots',
+    name: 'depots',
+    component: DepotsView,
+    meta: { requiresAuth: true, title: 'Dépôts' }
+  },
+  
+  // ===================== FINANCES =====================
+  {
+    path: '/finances/validation',
+    name: 'validation-finance',
+    component: ValidationFinanceView,
+    meta: { requiresAuth: true, title: 'Validation demandes' }
+  },
+  {
+    path: '/finances/caisses',
+    name: 'caisses',
+    component: CaissesView,
+    meta: { requiresAuth: true, title: 'Caisses' }
+  },
+  {
+    path: '/finances/paiements-achats',
+    name: 'paiements-achats',
+    component: PaiementsAchatView,
+    meta: { requiresAuth: true, title: 'Paiements fournisseurs' }
+  },
+  {
+    path: '/finances/paiements-ventes',
+    name: 'paiements-ventes',
+    component: PaiementsVenteView,
+    meta: { requiresAuth: true, title: 'Encaissements clients' }
+  },
+  
+  // ===================== RÉFÉRENTIEL =====================
+  {
+    path: '/referentiel/entreprises',
+    name: 'entreprises',
+    component: EntreprisesView,
+    meta: { requiresAuth: true, title: 'Entreprises' }
+  },
+  {
+    path: '/referentiel/fournisseurs',
+    name: 'fournisseurs',
+    component: FournisseursView,
+    meta: { requiresAuth: true, title: 'Fournisseurs' }
+  },
+  {
+    path: '/referentiel/clients',
+    name: 'clients',
+    component: ClientsView,
+    meta: { requiresAuth: true, title: 'Clients' }
+  },
+  {
+    path: '/referentiel/personnel',
+    name: 'personnel',
+    component: PersonnelView,
+    meta: { requiresAuth: true, title: 'Personnel' }
+  },
+  
+  // Catch-all redirect
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
+  }
+]
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes
+})
+
+// Navigation guard
+router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore()
+  
+  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
+    next('/login')
+  } else if (to.path === '/login' && authStore.isAuthenticated) {
+    next('/')
+  } else {
+    next()
+  }
+})
+
+export default router
