@@ -84,7 +84,11 @@ INSERT INTO fournisseur (nom, adresse) VALUES
 -- ------------------------------------------------------------------------------
 INSERT INTO client (nom, adresse) VALUES
 ('Compagnie AGRI-MADA', 'Lot 23, Zone Agricole, Antananarivo'),
-('Entreprise Locale S.A.R.L.', 'Avenue de l''Independance, Toamasina');
+('Entreprise Locale S.A.R.L.', 'Avenue de l''Independance, Toamasina'),
+('SARL Madagascar Commerce', 'Lot II M 45 Bis Analakely, Antananarivo'),
+('Entreprise ROVA Distribution', '67 Avenue de l''Independance, Antananarivo'),
+('Societe TIKO Trading', 'BP 1234 - Antsirabe 110'),
+('SARL HERY Import Export', 'Rue Rainilaiarivony, Fianarantsoa');
 
 -- ------------------------------------------------------------------------------
 -- 11. ARTICLES (À INSeRER)

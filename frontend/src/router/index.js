@@ -13,6 +13,7 @@ const BonsLivraisonAchatView = () => import('@/views/achats/BonsLivraisonAchatVi
 const FacturesAchatView = () => import('@/views/achats/FacturesAchatView.vue')
 
 // Ventes
+const DemandesAchatClientView = () => import('@/views/ventes/DemandesAchatClientView.vue')
 const DemandesProformaView = () => import('@/views/ventes/DemandesProformaView.vue')
 const DevisVenteView = () => import('@/views/ventes/DevisVenteView.vue')
 const BonsCommandeVenteView = () => import('@/views/ventes/BonsCommandeVenteView.vue')
@@ -73,6 +74,12 @@ const routes = [
   },
   
   // ===================== VENTES =====================
+  {
+    path: '/ventes/demandes-client',
+    name: 'demandes-achat-client',
+    component: DemandesAchatClientView,
+    meta: { requiresAuth: true, title: 'Demandes d\'achat client' }
+  },
   {
     path: '/ventes/demandes-proforma',
     name: 'demandes-proforma',

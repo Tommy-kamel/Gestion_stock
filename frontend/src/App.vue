@@ -88,21 +88,24 @@
                 </svg>
               </button>
               <div v-show="openMenus.ventes" class="pl-4 space-y-1 mt-1">
+                <router-link to="/ventes/demandes-client" class="nav-sublink" active-class="active">
+                  Demandes d'achat client
+                </router-link>
                 <router-link to="/ventes/demandes-proforma" class="nav-sublink" active-class="active">
-                  Demandes de proforma
+                  Creation proforma
                 </router-link>
-                <router-link to="/ventes/devis" class="nav-sublink" active-class="active">
+                <!-- <router-link to="/ventes/devis" class="nav-sublink" active-class="active">
                   Devis / Proformas
-                </router-link>
+                </router-link> -->
                 <router-link to="/ventes/bons-commande" class="nav-sublink" active-class="active">
                   Bons de commande
                 </router-link>
-                <router-link to="/ventes/bons-livraison" class="nav-sublink" active-class="active">
+                <!-- <router-link to="/ventes/bons-livraison" class="nav-sublink" active-class="active">
                   Bons de livraison
                 </router-link>
                 <router-link to="/ventes/factures" class="nav-sublink" active-class="active">
                   Factures clients
-                </router-link>
+                </router-link> -->
               </div>
             </div>
 
