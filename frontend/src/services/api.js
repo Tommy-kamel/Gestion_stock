@@ -111,6 +111,7 @@ export const stockApi = {
   
   // État du stock
   getAllStocks: () => api.get('/stock/tous'),
+  getStockValorise: () => api.get('/stock/valorisation'),
   getStocksByDepot: (depotId) => api.get(`/stock/niveau?depotId=${depotId}`),
   getStocksByArticle: (articleId) => api.get(`/stock/niveau/article/${articleId}`),
   getStock: (articleId, depotId) => api.get(`/stock/niveau/article/${articleId}/depot/${depotId}`),

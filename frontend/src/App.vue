@@ -68,12 +68,6 @@
                 <router-link to="/achats/bons-commande" class="nav-sublink" active-class="active">
                   Bons de commande
                 </router-link>
-                <router-link to="/achats/bons-livraison" class="nav-sublink" active-class="active">
-                  Bons de livraison
-                </router-link>
-                <router-link to="/achats/factures" class="nav-sublink" active-class="active">
-                  Factures fournisseurs
-                </router-link>
               </div>
             </div>
 
@@ -129,8 +123,8 @@
                 </svg>
               </button>
               <div v-show="openMenus.stock" class="pl-4 space-y-1 mt-1">
-                <router-link to="/stock/etat" class="nav-sublink" active-class="active">
-                  État des stocks
+                <router-link to="/stock/valorisation" class="nav-sublink" active-class="active">
+                  Valorisation des stocks
                 </router-link>
                 <router-link to="/stock/articles" class="nav-sublink" active-class="active">
                   Articles

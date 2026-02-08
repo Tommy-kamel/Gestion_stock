@@ -20,7 +20,7 @@ const BonsLivraisonVenteView = () => import('@/views/ventes/BonsLivraisonVenteVi
 const FacturesVenteView = () => import('@/views/ventes/FacturesVenteView.vue')
 
 // Stock
-const EtatStockView = () => import('@/views/stock/EtatStockView.vue')
+const ValorisationStockView = () => import('@/views/stock/ValorisationStockView.vue')
 const ArticlesView = () => import('@/views/stock/ArticlesView.vue')
 const LotsView = () => import('@/views/stock/LotsView.vue')
 const MouvementsView = () => import('@/views/stock/MouvementsView.vue')
@@ -106,10 +106,10 @@ const routes = [
   
   // ===================== STOCK =====================
   {
-    path: '/stock/etat',
-    name: 'etat-stock',
-    component: EtatStockView,
-    meta: { requiresAuth: true, title: 'État des stocks' }
+    path: '/stock/valorisation',
+    name: 'valorisation-stock',
+    component: ValorisationStockView,
+    meta: { requiresAuth: true, title: 'Valorisation des stocks' }
   },
   {
     path: '/stock/articles',
