@@ -20,8 +20,6 @@
           <option value="">Tous les types</option>
           <option value="ENTREE">Entrées</option>
           <option value="SORTIE">Sorties</option>
-          <option value="TRANSFERT">Transferts</option>
-          <option value="AJUSTEMENT">Ajustements</option>
         </select>
         <select v-model="filterArticle" class="border-gray-300 rounded-lg text-sm">
           <option value="">Tous les articles</option>

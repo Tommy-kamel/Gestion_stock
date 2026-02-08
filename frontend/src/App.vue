@@ -126,18 +126,18 @@
                 <router-link to="/stock/valorisation" class="nav-sublink" active-class="active">
                   Valorisation des stocks
                 </router-link>
-                <router-link to="/stock/articles" class="nav-sublink" active-class="active">
-                  Articles
-                </router-link>
-                <router-link to="/stock/lots" class="nav-sublink" active-class="active">
-                  Lots
-                </router-link>
                 <router-link to="/stock/mouvements" class="nav-sublink" active-class="active">
                   Mouvements
                 </router-link>
-                <router-link to="/stock/depots" class="nav-sublink" active-class="active">
-                  Dépôts
+                <!-- <router-link to="/stock/articles" class="nav-sublink" active-class="active">
+                  Articles
+                </router-link> -->
+                <router-link to="/stock/lots" class="nav-sublink" active-class="active">
+                  Lots
                 </router-link>
+                <!-- <router-link to="/stock/depots" class="nav-sublink" active-class="active">
+                  Dépôts
+                </router-link> -->
               </div>
             </div>
           </nav>

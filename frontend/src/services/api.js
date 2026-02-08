@@ -40,7 +40,8 @@ export const achatApi = {
   getDemandeAchat: (id) => api.get(`/achats/demandes/${id}`),
   creerDemandeAchat: (data) => api.post('/achats/demandes', data),
   validerDemandeAchat: (id) => api.put(`/achats/demandes/${id}/valider`),
-  soumettreDemandeAchat: (id) => api.post(`/achats/demandes/${id}/soumettre`),
+  rejeterDemandeAchat: (id, motif) => api.put(`/achats/demandes/${id}/rejeter?motif=${encodeURIComponent(motif)}`),
+  soumettreDemandeAchat: (id) => api.put(`/achats/demandes/${id}/soumettre`),
   approuverDemandeAchat: (id, personnelId) => api.post(`/achats/demandes/${id}/approuver?personnelId=${personnelId}`),
   
   // Proformas

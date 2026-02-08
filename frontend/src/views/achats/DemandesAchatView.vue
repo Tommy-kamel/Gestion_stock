@@ -19,23 +19,23 @@
       <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Entreprise</label>
-          <select v-model="filters.entreprise" class="w-full px-3 py-2 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+          <select v-model="filters.entreprise" @change="onFilterEntrepriseChange" class="w-full px-3 py-2 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
             <option value="">Toutes</option>
             <option v-for="entreprise in entreprises" :key="entreprise.id" :value="entreprise.id">{{ entreprise.nom }}</option>
           </select>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Site</label>
-          <select v-model="filters.site" class="w-full px-3 py-2 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+          <select v-model="filters.site" @change="onFilterSiteChange" class="w-full px-3 py-2 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
             <option value="">Tous</option>
-            <option v-for="site in sites" :key="site.id" :value="site.id">{{ site.nom }}</option>
+            <option v-for="site in filteredSitesForFilters" :key="site.id" :value="site.id">{{ site.nom }}</option>
           </select>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">Dépôt</label>
           <select v-model="filters.depot" class="w-full px-3 py-2 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
             <option value="">Tous</option>
-            <option v-for="depot in depots" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
+            <option v-for="depot in filteredDepotsForFilters" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
           </select>
         </div>
         <div>
@@ -98,6 +98,12 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </button>
+                  <button v-if="da.status?.code === 'SOUMIS'" @click="refuser(da)" 
+                          class="text-red-600 hover:text-red-900" title="Refuser">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
                   <button v-if="da.status?.code === 'VALIDE'" @click="viewProformas(da)" 
                           class="text-purple-600 hover:text-purple-900" title="Voir les proformas">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,23 +140,23 @@
             <div class="grid grid-cols-3 gap-4">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Entreprise *</label>
-                <select v-model="newDemande.entrepriseId" required class="w-full px-4 py-3 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                <select v-model="newDemande.entrepriseId" @change="onFormEntrepriseChange" required class="w-full px-4 py-3 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                   <option value="">Sélectionner une entreprise</option>
                   <option v-for="entreprise in entreprises" :key="entreprise.id" :value="entreprise.id">{{ entreprise.nom }}</option>
                 </select>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Site *</label>
-                <select v-model="newDemande.siteId" required class="w-full px-4 py-3 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
+                <select v-model="newDemande.siteId" @change="onFormSiteChange" required class="w-full px-4 py-3 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                   <option value="">Sélectionner un site</option>
-                  <option v-for="site in sites" :key="site.id" :value="site.id">{{ site.nom }}</option>
+                  <option v-for="site in filteredSitesForForm" :key="site.id" :value="site.id">{{ site.nom }}</option>
                 </select>
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Dépôt cible *</label>
                 <select v-model="newDemande.depotCibleId" required class="w-full px-4 py-3 border border-gray-200 rounded-lg hover:border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors">
                   <option value="">Sélectionner un dépôt</option>
-                  <option v-for="depot in depots" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
+                  <option v-for="depot in filteredDepotsForForm" :key="depot.id" :value="depot.id">{{ depot.nom }}</option>
                 </select>
               </div>
             </div>
@@ -405,6 +411,28 @@ const newDemande = reactive({
   details: [{ articleId: '', quantite: 1, prixUnitaire: 0 }]
 })
 
+// Computed pour les filtres synchronisés
+const filteredSitesForFilters = computed(() => {
+  if (!filters.entreprise) return sites.value
+  return sites.value.filter(s => s.entreprise?.id === filters.entreprise)
+})
+
+const filteredDepotsForFilters = computed(() => {
+  if (!filters.site) return depots.value
+  return depots.value.filter(d => d.site?.id === filters.site)
+})
+
+// Computed pour le formulaire de création
+const filteredSitesForForm = computed(() => {
+  if (!newDemande.entrepriseId) return sites.value
+  return sites.value.filter(s => s.entreprise?.id === newDemande.entrepriseId)
+})
+
+const filteredDepotsForForm = computed(() => {
+  if (!newDemande.siteId) return depots.value
+  return depots.value.filter(d => d.site?.id === newDemande.siteId)
+})
+
 const filteredDemandes = computed(() => {
   return demandes.value.filter(da => {
     if (filters.entreprise && da.entreprise?.id !== filters.entreprise) return false
@@ -444,8 +472,67 @@ const addArticleLine = () => {
 }
 
 const removeArticleLine = (index) => {
-  if (newDemande.details.length > 1) {
-    newDemande.details.splice(index, 1)
+  newDemande.details.splice(index, 1)
+}
+
+// Gestion des changements de filtres
+const onFilterEntrepriseChange = () => {
+  filters.site = ''
+  filters.depot = ''
+}
+
+const onFilterSiteChange = () => {
+  filters.depot = ''
+}
+
+// Gestion des changements dans le formulaire
+const onFormEntrepriseChange = () => {
+  newDemande.siteId = ''
+  newDemande.depotCibleId = ''
+}
+
+const onFormSiteChange = () => {
+  newDemande.depotCibleId = ''
+}
+
+const valider = async (da) => {
+  if (confirm('Valider cette demande d\'achat ?')) {
+    try {
+      await achatApi.validerDemandeAchat(da.id)
+      loadDemandes()
+      alert('Demande validée avec succès')
+    } catch (error) {
+      console.error('Erreur validation:', error)
+      alert('Erreur lors de la validation')
+    }
+  }
+}
+
+const soumettre = async (da) => {
+  if (confirm('Soumettre cette demande d\'achat pour validation ?')) {
+    try {
+      await achatApi.soumettreDemandeAchat(da.id)
+      loadDemandes()
+      alert('Demande soumise avec succès')
+    } catch (error) {
+      console.error('Erreur soumission:', error)
+      alert('Erreur lors de la soumission')
+    }
+  }
+}
+
+const refuser = async (da) => {
+  const motif = prompt('Motif du refus:')
+  if (motif) {
+    try {
+      // Appeler l'API pour rejeter la demande
+      await achatApi.rejeterDemandeAchat(da.id, motif)
+      loadDemandes()
+      alert('Demande refusée')
+    } catch (error) {
+      console.error('Erreur refus:', error)
+      alert('Erreur lors du refus: ' + (error.response?.data?.message || error.message))
+    }
   }
 }
 
@@ -459,19 +546,6 @@ const viewDetails = async (da) => {
     console.error('Erreur chargement détails:', error)
     selectedDemande.value = da
     showDetailsModal.value = true
-  }
-}
-
-const valider = async (da) => {
-  if (confirm('Valider cette demande d\'achat ?')) {
-    try {
-      await achatApi.validerDemandeAchat(da.id)
-      loadDemandes()
-      alert('Demande validée avec succès')
-    } catch (error) {
-      console.error('Erreur validation:', error)
-      alert('Erreur lors de la validation')
-    }
   }
 }
 
