@@ -73,6 +73,19 @@ export const achatApi = {
 
 // ===================== VENTES =====================
 export const venteApi = {
+  // Demandes d'achat client
+  getDemandesClient: () => api.get('/ventes/demandes-client'),
+  getDemandeClient: (id) => api.get(`/ventes/demandes-client/${id}`),
+  creerDemandeClient: (data) => api.post('/ventes/demandes-client', data),
+  validerDemandeClient: (id) => api.put(`/ventes/demandes-client/${id}/valider`),
+  soumettreDemandeClient: (id) => api.put(`/ventes/demandes-client/${id}/soumettre`),
+  getDemandesClientValidees: () => api.get('/ventes/demandes-client/validees'),
+  
+  // Proformas vente
+  getProformasVente: () => api.get('/ventes/proformas'),
+  getProformasValides: () => api.get('/ventes/proformas/valides'),
+  creerProformaVente: (data) => api.post('/ventes/proformas', data),
+  
   // Demandes de proforma
   getDemandesProforma: () => api.get('/ventes/demandes-proforma'),
   creerDemandeProforma: (data) => api.post('/ventes/demandes-proforma', data),
@@ -82,9 +95,10 @@ export const venteApi = {
   creerDevis: (data) => api.post('/ventes/devis', data),
   validerDevis: (id) => api.post(`/ventes/devis/${id}/valider`),
   
-  // Bons de commande
+  // Bons de commande vente
   getBonsCommande: () => api.get('/ventes/bons-commande'),
-  creerBonCommande: (devisId, personnelId) => api.post(`/ventes/devis/${devisId}/bon-commande?personnelId=${personnelId}`),
+  creerBonCommandeDepuisProforma: (data) => api.post('/ventes/bons-commande', data),
+  livrerEtEncaisser: (bcId, data) => api.post(`/ventes/bons-commande/${bcId}/livrer-encaisser`, data),
   
   // Bons de livraison
   getBonsLivraison: () => api.get('/ventes/bons-livraison'),

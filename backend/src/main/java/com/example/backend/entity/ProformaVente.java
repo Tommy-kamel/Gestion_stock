@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,14 +20,17 @@ public class ProformaVente {
     @Column(name = "date_proforma")
     private LocalDate dateProforma;
 
-    @ManyToOne
-    @JoinColumn(name = "id_client", nullable = false)
-    private Client client;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "id_demande_achat_client", nullable = false)
+    private DemandeAchatClient demandeAchatClient;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_status", nullable = false)
     private Status status;
 
     @Column(name = "montant_ttc", precision = 15, scale = 2)
     private BigDecimal montantTtc;
+
+    @OneToMany(mappedBy = "proformaVente", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<ProformaVenteDetails> details;
 }

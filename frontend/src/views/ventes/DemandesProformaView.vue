@@ -2,15 +2,9 @@
   <div class="space-y-6">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold text-gray-900">Demandes de proforma</h1>
-        <p class="mt-1 text-sm text-gray-500">Demandes reçues des clients</p>
+        <h1 class="text-2xl font-bold text-gray-900">Création de proforma</h1>
+        <p class="mt-1 text-sm text-gray-500">Demandes d'achat client validées</p>
       </div>
-      <button @click="showCreateModal = true" class="btn-primary">
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Nouvelle demande
-      </button>
     </div>
 
     <!-- Tableau -->
@@ -19,33 +13,43 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Demande</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° DA Client</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date souhaitée</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="demande in demandes" :key="demande.id" class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ demande.numeroDemande }}</td>
+              <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">{{ demande.numeroDa }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(demande.dateDemande) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ demande.client?.nom }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ demande.client?.nom }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(demande.dateSouhaitee) }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="getStatutClass(demande.statut?.code)" class="px-2 py-1 text-xs font-medium rounded-full">
-                  {{ demande.statut?.libelle }}
+                <span :class="getStatutClass(demande.status?.code)" class="px-2 py-1 text-xs font-medium rounded-full">
+                  {{ demande.status?.libelle }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">
-                <button v-if="demande.statut?.code === 'BROUILLON'" @click="creerDevis(demande)" class="text-green-600 hover:text-green-900" title="Créer devis">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </button>
+                <div class="flex items-center space-x-2">
+                  <button @click="viewDetails(demande)" class="text-indigo-600 hover:text-indigo-900" title="Voir détails">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </button>
+                  <button @click="creerProforma(demande)" class="text-green-600 hover:text-green-900" title="Créer proforma">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </button>
+                </div>
               </td>
             </tr>
             <tr v-if="demandes.length === 0">
-              <td colspan="5" class="px-6 py-12 text-center text-gray-500">Aucune demande</td>
+              <td colspan="6" class="px-6 py-12 text-center text-gray-500">Aucune demande validée</td>
             </tr>
           </tbody>
         </table>
@@ -56,43 +60,127 @@
     <div v-if="showCreateModal" class="fixed inset-0 z-50 overflow-y-auto">
       <div class="flex items-center justify-center min-h-screen px-4">
         <div class="fixed inset-0 bg-black bg-opacity-50" @click="showCreateModal = false"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Nouvelle demande de proforma</h3>
-          <form @submit.prevent="submitDemande" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+        <div class="relative bg-white rounded-xl shadow-xl max-w-3xl w-full p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Créer proforma pour {{ selectedDemande?.numeroDa }}</h3>
+          
+          <div class="mb-4 bg-blue-50 p-4 rounded-lg">
+            <div class="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Client</label>
-                <select v-model="newDemande.clientId" required class="w-full border-gray-300 rounded-lg">
-                  <option value="">Sélectionner</option>
-                  <option v-for="c in clients" :key="c.id" :value="c.id">{{ c.nom }}</option>
-                </select>
+                <span class="font-medium text-gray-700">Client:</span>
+                <span class="ml-2 text-gray-900">{{ selectedDemande?.client?.nom }}</span>
               </div>
               <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                <input v-model="newDemande.dateDemande" type="date" required class="w-full border-gray-300 rounded-lg">
+                <span class="font-medium text-gray-700">Date demande:</span>
+                <span class="ml-2 text-gray-900">{{ formatDate(selectedDemande?.dateDemande) }}</span>
               </div>
             </div>
+          </div>
+
+          <form @submit.prevent="submitProforma" class="space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date proforma</label>
+              <input v-model="newProforma.dateProforma" type="date" required class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+            </div>
+
             <div>
               <div class="flex justify-between mb-2">
                 <label class="text-sm font-medium text-gray-700">Articles</label>
-                <button type="button" @click="addLine" class="text-sm text-indigo-600">+ Ajouter</button>
               </div>
-              <div class="space-y-2">
-                <div v-for="(line, idx) in newDemande.details" :key="idx" class="flex space-x-2">
-                  <select v-model="line.articleId" required class="flex-1 border-gray-300 rounded-lg text-sm">
-                    <option value="">Article</option>
-                    <option v-for="a in articles" :key="a.id" :value="a.id">{{ a.reference }} - {{ a.designation }}</option>
-                  </select>
-                  <input v-model.number="line.quantite" type="number" min="1" placeholder="Qté" class="w-24 border-gray-300 rounded-lg text-sm">
-                  <button type="button" @click="removeLine(idx)" class="text-red-500"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-                </div>
+              <div class="border border-gray-200 rounded-lg overflow-hidden">
+                <table class="min-w-full">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Article</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Qté demandée</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Prix unitaire</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                    <tr v-for="(line, idx) in newProforma.details" :key="idx">
+                      <td class="px-4 py-2 text-sm">
+                        {{ getArticleLabel(line.articleId) }}
+                      </td>
+                      <td class="px-4 py-2">
+                        <input v-model.number="line.quantite" type="number" min="0.01" step="0.01" required 
+                               class="w-24 px-2 py-1 border border-gray-300 rounded text-sm">
+                      </td>
+                      <td class="px-4 py-2">
+                        <input v-model.number="line.prixUnitaire" type="number" min="0" step="0.01" required 
+                               class="w-32 px-2 py-1 border border-gray-300 rounded text-sm">
+                      </td>
+                      <td class="px-4 py-2 text-sm font-medium">
+                        {{ formatCurrency(line.quantite * line.prixUnitaire) }}
+                      </td>
+                    </tr>
+                    <tr class="bg-gray-50 font-semibold">
+                      <td colspan="3" class="px-4 py-2 text-right text-sm">Total général:</td>
+                      <td class="px-4 py-2 text-sm">{{ formatCurrency(totalProforma) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
-            <div class="flex justify-end space-x-3 pt-4">
+
+            <div class="flex justify-end space-x-3 pt-4 border-t">
               <button type="button" @click="showCreateModal = false" class="btn-secondary">Annuler</button>
-              <button type="submit" class="btn-primary">Créer</button>
+              <button type="submit" class="btn-primary">Créer proforma</button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal détails -->
+    <div v-if="showDetailsModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50" @click="showDetailsModal = false"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-3xl w-full p-6">
+          <h3 class="text-lg font-semibold text-gray-900 mb-4">Détails - {{ selectedDemande?.numeroDa }}</h3>
+          
+          <div class="grid grid-cols-3 gap-4 mb-6">
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-xs text-gray-500 mb-1">Client</p>
+              <p class="font-semibold text-gray-900">{{ selectedDemande?.client?.nom }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-xs text-gray-500 mb-1">Date demande</p>
+              <p class="font-semibold text-gray-900">{{ formatDate(selectedDemande?.dateDemande) }}</p>
+            </div>
+            <div class="bg-gray-50 p-3 rounded-lg">
+              <p class="text-xs text-gray-500 mb-1">Date souhaitée</p>
+              <p class="font-semibold text-gray-900">{{ formatDate(selectedDemande?.dateSouhaitee) }}</p>
+            </div>
+          </div>
+
+          <div>
+            <h4 class="font-semibold text-gray-900 mb-3">Articles demandés</h4>
+            <div class="border border-gray-200 rounded-lg overflow-hidden">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Référence</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Désignation</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Quantité</th>
+                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Prix unitaire</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="detail in selectedDemande?.details" :key="detail.id">
+                    <td class="px-4 py-2 text-sm font-medium">{{ detail.article?.reference }}</td>
+                    <td class="px-4 py-2 text-sm">{{ detail.article?.designation }}</td>
+                    <td class="px-4 py-2 text-sm">{{ detail.quantiteDemandee }}</td>
+                    <td class="px-4 py-2 text-sm">{{ formatCurrency(detail.prixUnitaire) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-4 mt-4 border-t">
+            <button @click="showDetailsModal = false" class="btn-secondary">Fermer</button>
+            <button @click="creerProforma(selectedDemande); showDetailsModal = false" class="btn-primary">Créer proforma</button>
+          </div>
         </div>
       </div>
     </div>
@@ -100,58 +188,130 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
-import { venteApi, referenceApi, stockApi } from '@/services/api'
-import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+import { ref, reactive, computed, onMounted } from 'vue'
+import { venteApi, stockApi } from '@/services/api'
 
-const router = useRouter()
-const authStore = useAuthStore()
 const demandes = ref([])
-const clients = ref([])
 const articles = ref([])
 const showCreateModal = ref(false)
+const showDetailsModal = ref(false)
+const selectedDemande = ref(null)
 
-const newDemande = reactive({
-  clientId: '', dateDemande: new Date().toISOString().split('T')[0], details: [{ articleId: '', quantite: 1 }]
+const newProforma = reactive({
+  dateProforma: new Date().toISOString().split('T')[0],
+  details: []
 })
 
-const formatDate = (d) => d ? new Date(d).toLocaleDateString('fr-FR') : ''
-const getStatutClass = (code) => ({ 'BROUILLON': 'bg-gray-100 text-gray-800', 'VALIDE': 'bg-green-100 text-green-800' }[code] || 'bg-gray-100 text-gray-800')
-const addLine = () => newDemande.details.push({ articleId: '', quantite: 1 })
-const removeLine = (idx) => { if (newDemande.details.length > 1) newDemande.details.splice(idx, 1) }
+const totalProforma = computed(() => {
+  return newProforma.details.reduce((sum, line) => {
+    return sum + (line.quantite * line.prixUnitaire)
+  }, 0)
+})
 
-const submitDemande = async () => {
-  try {
-    await venteApi.creerDemandeProforma({ ...newDemande, entrepriseId: authStore.user?.entreprise?.id || 1 })
-    showCreateModal.value = false
-    loadDemandes()
-  } catch (e) { console.error(e) }
+const formatDate = (d) => d ? new Date(d).toLocaleDateString('fr-FR') : 'N/A'
+const formatCurrency = (value) => {
+  if (!value && value !== 0) return '0 MGA'
+  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'MGA' }).format(value)
+}
+const getStatutClass = (code) => ({ 
+  'BROUILLON': 'bg-gray-100 text-gray-800', 
+  'VALIDE': 'bg-green-100 text-green-800',
+  'SOUMIS': 'bg-blue-100 text-blue-800'
+}[code] || 'bg-gray-100 text-gray-800')
+
+const getArticleLabel = (articleId) => {
+  const article = articles.value.find(a => a.id === articleId)
+  return article ? `${article.reference} - ${article.designation}` : ''
 }
 
-const creerDevis = (demande) => {
-  router.push({ path: '/ventes/devis', query: { demandeId: demande.id } })
+const viewDetails = async (demande) => {
+  try {
+    const response = await venteApi.getDemandeClient(demande.id)
+    selectedDemande.value = response.data
+    showDetailsModal.value = true
+  } catch (e) {
+    console.error('Erreur chargement détails:', e)
+    selectedDemande.value = demande
+    showDetailsModal.value = true
+  }
+}
+
+const creerProforma = async (demande) => {
+  try {
+    // Charger les détails complets si nécessaire
+    const response = await venteApi.getDemandeClient(demande.id)
+    selectedDemande.value = response.data
+    
+    // Pré-remplir le formulaire avec les articles de la demande
+    newProforma.details = selectedDemande.value.details.map(d => ({
+      articleId: d.article.id,
+      quantite: d.quantiteDemandee,
+      prixUnitaire: d.prixUnitaire || d.article.prixVenteRef || 0
+    }))
+    
+    showCreateModal.value = true
+  } catch (e) {
+    console.error('Erreur préparation proforma:', e)
+    alert('Erreur lors de la préparation de la proforma')
+  }
+}
+
+const submitProforma = async () => {
+  try {
+    if (!selectedDemande.value) {
+      alert('Aucune demande sélectionnée')
+      return
+    }
+
+    const data = {
+      demandeAchatClientId: selectedDemande.value.id,
+      dateProforma: newProforma.dateProforma,
+      details: newProforma.details.map(d => ({
+        articleId: d.articleId,
+        quantite: d.quantite,
+        prixUnitaire: d.prixUnitaire
+      }))
+    }
+    
+    await venteApi.creerProformaVente(data)
+    showCreateModal.value = false
+    alert('Proforma créée avec succès!')
+    loadDemandes()
+    
+    // Reset
+    newProforma.dateProforma = new Date().toISOString().split('T')[0]
+    newProforma.details = []
+    selectedDemande.value = null
+  } catch (e) {
+    console.error('Erreur création proforma:', e)
+    alert('Erreur lors de la création: ' + (e.response?.data || e.message))
+  }
 }
 
 const loadDemandes = async () => {
-  try { demandes.value = (await venteApi.getDemandesProforma()).data || [] }
-  catch (e) { demandes.value = [{ id: 1, numeroDemande: 'DPV-2024-001', dateDemande: '2024-01-15', client: { nom: 'Client Alpha' }, statut: { code: 'BROUILLON', libelle: 'Brouillon' } }] }
-}
-
-const loadClients = async () => {
-  try { clients.value = (await referenceApi.getClients()).data || [] }
-  catch (e) { clients.value = [{ id: 5, nom: 'Client Société Alpha' }, { id: 6, nom: 'Client Entreprise Beta' }] }
+  try {
+    const response = await venteApi.getDemandesClientValidees()
+    demandes.value = response.data || []
+  } catch (e) {
+    console.error('Erreur chargement demandes:', e)
+    demandes.value = []
+  }
 }
 
 const loadArticles = async () => {
-  try { articles.value = (await stockApi.getArticles()).data || [] }
-  catch (e) { 
+  try {
+    const response = await stockApi.getArticles()
+    articles.value = response.data || []
+  } catch (e) { 
     console.error('Erreur chargement articles:', e)
     articles.value = []
   }
 }
 
-onMounted(() => { loadDemandes(); loadClients(); loadArticles() })
+onMounted(() => { 
+  loadDemandes()
+  loadArticles()
+})
 </script>
 
 <style scoped>

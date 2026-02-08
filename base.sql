@@ -261,16 +261,42 @@ CREATE TABLE facture_achat_details (
 -- -----------------------------------------------------------------------------
 -- 6. VENTES
 -- -----------------------------------------------------------------------------
+CREATE TABLE demande_achat_client (
+    id                    SERIAL PRIMARY KEY,
+    numero_da             VARCHAR(50) UNIQUE NOT NULL,
+    date_demande          DATE DEFAULT CURRENT_DATE,
+    id_client INTEGER NOT NULL,
+    date_souhaitee        DATE,
+    id_status             INTEGER NOT NULL,
+    date_creation         TIMESTAMP DEFAULT NOW(),
+    FOREIGN KEY (id_client) REFERENCES client(id),
+    FOREIGN KEY (id_status) REFERENCES status(id)
+);
+
+CREATE TABLE demande_achat_client_details (
+    id                        SERIAL PRIMARY KEY,
+    id_demande_achat_client INTEGER NOT NULL,
+    id_article                INTEGER NOT NULL,
+    quantite_demandee         NUMERIC(15,2) NOT NULL,
+    prix_unitaire               NUMERIC(15,2) DEFAULT 0,
+    FOREIGN KEY (id_demande_achat_client) REFERENCES demande_achat_client(id) ON DELETE CASCADE,
+    FOREIGN KEY (id_article)       REFERENCES article(id)
+);
+
 CREATE TABLE proforma_vente (
     id                 SERIAL PRIMARY KEY,
     numero_proforma       VARCHAR(50) UNIQUE NOT NULL,
     date_proforma         DATE DEFAULT CURRENT_DATE,
-    id_client INTEGER NOT NULL,
     id_status          INTEGER NOT NULL,
     montant_ttc        NUMERIC(15,2),
-    FOREIGN KEY (id_client) REFERENCES client(id),
     FOREIGN KEY (id_status) REFERENCES status(id)
 );
+ALTER TABLE proforma_vente ADD COLUMN id_demande_achat_client INTEGER NOT NULL;
+
+ALTER TABLE proforma_vente
+ADD CONSTRAINT fk_proforma_demande
+FOREIGN KEY (id_demande_achat_client)
+REFERENCES demande_achat_client(id);
 
 CREATE TABLE proforma_vente_details (
     id           SERIAL PRIMARY KEY,
