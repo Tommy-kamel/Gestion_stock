@@ -92,9 +92,22 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
-                  <button v-if="da.status?.code !== 'VALIDE'" @click="valider(da)" class="text-green-600 hover:text-green-900" title="Valider">
+                  <button v-if="da.status?.code !== 'VALIDE' && da.status?.code !== 'CLOTURE'" @click="valider(da)" 
+                          class="text-green-600 hover:text-green-900" title="Valider">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </button>
+                  <button v-if="da.status?.code === 'VALIDE'" @click="viewProformas(da)" 
+                          class="text-purple-600 hover:text-purple-900" title="Voir les proformas">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </button>
+                  <button v-if="da.status?.code === 'VALIDE'" @click="selectionnerMeilleurProforma(da)" 
+                          class="text-blue-600 hover:text-blue-900" title="Sélectionner meilleur proforma">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                     </svg>
                   </button>
                 </div>
@@ -291,6 +304,66 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal Proformas -->
+    <div v-if="showProformasModal" class="fixed inset-0 z-50 overflow-y-auto">
+      <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="fixed inset-0 bg-black bg-opacity-50" @click="showProformasModal = false"></div>
+        <div class="relative bg-white rounded-xl shadow-xl max-w-5xl w-full p-8">
+          <h3 class="text-xl font-semibold text-gray-900 mb-6">
+            Proformas pour la DA {{ selectedDemande?.numeroDa }}
+          </h3>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Proforma</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fournisseur</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Montant TTC</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date émission</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date validité</th>
+                  <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr v-for="proforma in proformasDemande" :key="proforma.id" class="hover:bg-gray-50">
+                  <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ proforma.numeroProforma }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-700">{{ proforma.fournisseur?.nom }}</td>
+                  <td class="px-4 py-3 text-sm font-semibold text-gray-900">{{ formatCurrency(proforma.montantTtc) }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-500">{{ formatDate(proforma.dateEmission) }}</td>
+                  <td class="px-4 py-3 text-sm text-gray-500">{{ formatDate(proforma.dateValidite) }}</td>
+                  <td class="px-4 py-3">
+                    <span v-if="proforma.status?.code === 'VALIDE'" class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                      {{ proforma.status?.libelle }}
+                    </span>
+                    <span v-else-if="proforma.status?.code === 'ANNULE'" class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                      {{ proforma.status?.libelle }}
+                    </span>
+                    <span v-else class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                      {{ proforma.status?.libelle || 'Brouillon' }}
+                    </span>
+                  </td>
+                </tr>
+                <tr v-if="proformasDemande.length === 0">
+                  <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                    Aucun proforma pour cette demande d'achat
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex justify-end space-x-3 pt-6 border-t mt-6">
+            <button @click="showProformasModal = false" class="btn-secondary">Fermer</button>
+            <button v-if="proformasDemande.length > 0" @click="selectionnerMeilleurProforma(selectedDemande); showProformasModal = false" 
+                    class="btn-primary">
+              Sélectionner le meilleur
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -309,7 +382,9 @@ const sites = ref([])
 
 const showCreateModal = ref(false)
 const showDetailsModal = ref(false)
+const showProformasModal = ref(false)
 const selectedDemande = ref(null)
+const proformasDemande = ref([])
 
 const filters = reactive({
   search: '',
@@ -438,6 +513,31 @@ const approuver = async (da) => {
     } catch (error) {
       console.error('Erreur approbation:', error)
     }
+  }
+}
+
+const selectionnerMeilleurProforma = async (da) => {
+  if (confirm(`Sélectionner automatiquement le meilleur proforma pour la DA ${da.numeroDa} ?\n\nLe système va sélectionner le proforma avec le prix le plus bas et annuler les autres.`)) {
+    try {
+      await achatApi.selectionnerMeilleurProforma(da.id)
+      alert('Le meilleur proforma a été sélectionné avec succès')
+      loadDemandes()
+    } catch (error) {
+      console.error('Erreur sélection proforma:', error)
+      alert('Erreur lors de la sélection du proforma: ' + (error.response?.data?.message || error.message))
+    }
+  }
+}
+
+const viewProformas = async (da) => {
+  try {
+    selectedDemande.value = da
+    const response = await achatApi.getProformas(da.id)
+    proformasDemande.value = response.data
+    showProformasModal.value = true
+  } catch (error) {
+    console.error('Erreur chargement proformas:', error)
+    alert('Erreur lors du chargement des proformas')
   }
 }
 

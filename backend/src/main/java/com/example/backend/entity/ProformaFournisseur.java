@@ -1,9 +1,11 @@
 package com.example.backend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Entity
@@ -31,5 +33,13 @@ public class ProformaFournisseur {
 
     @ManyToOne
     @JoinColumn(name = "id_demande_achat")
+    @JsonIgnoreProperties("details")
     private DemandeAchat demandeAchat;
+
+    @ManyToOne
+    @JoinColumn(name = "id_status", nullable = false)
+    private Status status;
+
+    @OneToMany(mappedBy = "proformaFournisseur", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<ProformaFournisseurDetails> details;
 }

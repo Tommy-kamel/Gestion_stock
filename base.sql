@@ -197,6 +197,9 @@ CREATE TABLE proforma_fournisseur (
     FOREIGN KEY (id_demande_achat) REFERENCES demande_achat(id)
 );
 
+ALTER TABLE proforma_fournisseur ADD column id_status INTEGER NOT NULL;
+ALTER TABLE proforma_fournisseur ADD FOREIGN KEY (id_status) REFERENCES status(id);
+
 CREATE TABLE proforma_fournisseur_details (
     id                   SERIAL PRIMARY KEY,
     id_proforma_fournisseur INTEGER NOT NULL,

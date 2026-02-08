@@ -44,8 +44,10 @@ export const achatApi = {
   approuverDemandeAchat: (id, personnelId) => api.post(`/achats/demandes/${id}/approuver?personnelId=${personnelId}`),
   
   // Proformas
-  getProformas: (demandeId) => api.get(`/achats/demandes/${demandeId}/proformas`),
-  ajouterProforma: (demandeId, data) => api.post(`/achats/demandes/${demandeId}/proformas`, data),
+  getProformas: (demandeId) => api.get(`/proformas/demande/${demandeId}`),
+  getAllProformas: () => api.get('/proformas'),
+  creerProforma: (data) => api.post('/proformas', data),
+  selectionnerMeilleurProforma: (demandeId) => api.post(`/proformas/demande/${demandeId}/selectionner-meilleur`),
   
   // Validation finance
   validerFinance: (demandeId, personnelId) => api.post(`/achats/demandes/${demandeId}/valider-finance?personnelId=${personnelId}`),
@@ -211,7 +213,7 @@ export const referenceApi = {
   // Entreprises
   getEntreprises: () => api.get('/references/entreprises'),
   getEntreprisesInternes: () => api.get('/references/entreprises/internes'),
-  getFournisseurs: () => api.get('/references/entreprises/fournisseurs'),
+  getFournisseurs: () => api.get('/references/fournisseurs'),
   getClients: () => api.get('/references/entreprises/clients'),
   
   // Personnel

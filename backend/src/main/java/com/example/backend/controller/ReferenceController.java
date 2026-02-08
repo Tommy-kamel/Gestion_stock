@@ -1,8 +1,10 @@
 package com.example.backend.controller;
 
 import com.example.backend.entity.Entreprise;
+import com.example.backend.entity.Fournisseur;
 import com.example.backend.entity.Site;
 import com.example.backend.repository.EntrepriseRepository;
+import com.example.backend.repository.FournisseurRepository;
 import com.example.backend.repository.SiteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ public class ReferenceController {
 
     private final EntrepriseRepository entrepriseRepository;
     private final SiteRepository siteRepository;
+    private final FournisseurRepository fournisseurRepository;
 
     @GetMapping("/entreprises")
     public ResponseEntity<List<Entreprise>> getEntreprises() {
@@ -34,6 +37,16 @@ public class ReferenceController {
         try {
             List<Site> sites = siteRepository.findAll();
             return ResponseEntity.ok(sites);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @GetMapping("/fournisseurs")
+    public ResponseEntity<List<Fournisseur>> getFournisseurs() {
+        try {
+            List<Fournisseur> fournisseurs = fournisseurRepository.findAll();
+            return ResponseEntity.ok(fournisseurs);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
