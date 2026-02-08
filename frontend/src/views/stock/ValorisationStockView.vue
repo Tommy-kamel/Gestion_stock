@@ -53,12 +53,12 @@
         <p class="text-2xl font-bold text-indigo-600">{{ formatMontant(totalValeur) }} MGA</p>
       </div>
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <p class="text-sm text-gray-500">Nombre d'articles</p>
+        <p class="text-sm text-gray-500">Nombre de mouvements</p>
         <p class="text-2xl font-bold text-gray-900">{{ filteredStock.length }}</p>
       </div>
       <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <p class="text-sm text-gray-500">Quantité totale</p>
-        <p class="text-2xl font-bold text-green-600">{{ totalQuantite }}</p>
+        <p class="text-sm text-gray-500">Total entrées / sorties</p>
+        <p class="text-2xl font-bold text-green-600">+{{ totalEntrees }} / <span class="text-red-600">-{{ totalSorties }}</span></p>
       </div>
     </div>
 
@@ -68,37 +68,50 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Article</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Dépôt</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Site</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date mouvement</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Méthode</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantité</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix unitaire</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valeur totale</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stock avant</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Quantité</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Stock après</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Prix unitaire</th>
+              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Valeur totale</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
             <tr v-for="stock in filteredStock" :key="stock.id" class="hover:bg-gray-50">
               <td class="px-6 py-4 whitespace-nowrap">
+                <span :class="stock.typeMouvement === 'ENTREE' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'" class="px-2 py-1 text-xs font-medium rounded-full">
+                  {{ stock.typeMouvement }}
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
                 <div>
-                  <p class="font-medium text-gray-900">{{ stock.article?.reference }}</p>
-                  <p class="text-sm text-gray-500">{{ stock.article?.designation }}</p>
+                  <p class="font-medium text-gray-900">{{ stock.article?.designation }}</p>
+                  <p class="text-sm text-gray-500">{{ stock.article?.reference }}</p>
                 </div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ stock.depot?.nom }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ stock.depot?.site?.nom }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(stock.dateMouvement) }}</td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <span :class="getMethodeClass(stock.methodeValorisation?.code)" class="px-2 py-1 text-xs font-medium rounded-full">
                   {{ stock.methodeValorisation?.code || 'N/A' }}
                 </span>
-                <p class="text-xs text-gray-500 mt-1">{{ stock.methodeValorisation?.libelle }}</p>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">{{ formatQuantite(stock.quantiteActuelle) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm">{{ formatMontant(stock.prixUnitaire) }} MGA</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-indigo-600">{{ formatMontant(stock.valeurTotale) }} MGA</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">{{ formatQuantite(stock.quantiteStockAvant) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium" :class="stock.typeMouvement === 'ENTREE' ? 'text-green-600' : 'text-red-600'">
+                {{ stock.typeMouvement === 'ENTREE' ? '+' : '-' }}{{ formatQuantite(stock.quantite) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">{{ formatQuantite(stock.quantiteStockApres) }}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right">{{ formatMontant(stock.prixUnitaire) }} MGA</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-indigo-600">{{ formatMontant(stock.valeurTotale) }} MGA</td>
             </tr>
             <tr v-if="filteredStock.length === 0">
-              <td colspan="7" class="px-6 py-12 text-center text-gray-500">Aucun stock trouvé</td>
+              <td colspan="11" class="px-6 py-12 text-center text-gray-500">Aucun mouvement trouvé</td>
             </tr>
           </tbody>
         </table>
@@ -145,8 +158,30 @@ const filteredStock = computed(() => {
   return list
 })
 
-const totalValeur = computed(() => 
-  filteredStock.value.reduce((sum, s) => sum + (s.valeurTotale || 0), 0)
+const totalValeur = computed(() => {
+  const valeursEntrees = filteredStock.value
+    .filter(s => s.typeMouvement === 'ENTREE')
+    .reduce((sum, s) => sum + (s.valeurTotale || 0), 0)
+  
+  const valeursSorties = filteredStock.value
+    .filter(s => s.typeMouvement === 'SORTIE')
+    .reduce((sum, s) => sum + (s.valeurTotale || 0), 0)
+  
+  return valeursEntrees - valeursSorties
+})
+
+const totalEntrees = computed(() => 
+  filteredStock.value
+    .filter(s => s.typeMouvement === 'ENTREE')
+    .reduce((sum, s) => sum + (parseFloat(s.quantite) || 0), 0)
+    .toFixed(2)
+)
+
+const totalSorties = computed(() => 
+  filteredStock.value
+    .filter(s => s.typeMouvement === 'SORTIE')
+    .reduce((sum, s) => sum + (parseFloat(s.quantite) || 0), 0)
+    .toFixed(2)
 )
 
 const totalQuantite = computed(() => 
@@ -155,6 +190,7 @@ const totalQuantite = computed(() =>
 
 const formatMontant = (m) => m ? new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(m) : '0.00'
 const formatQuantite = (q) => q ? new Intl.NumberFormat('fr-FR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(q) : '0.00'
+const formatDate = (d) => d ? new Date(d).toLocaleDateString('fr-FR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''
 
 const getMethodeClass = (code) => {
   const classes = {
@@ -175,21 +211,25 @@ const onSiteChange = () => {
 }
 
 const exportStock = () => {
-  const csv = [['Article', 'Référence', 'Dépôt', 'Site', 'Méthode', 'Quantité', 'Prix unitaire', 'Valeur'].join(';')]
+  const csv = [['Type', 'Article', 'Référence', 'Dépôt', 'Site', 'Date mouvement', 'Méthode', 'Stock avant', 'Quantité', 'Stock après', 'Prix unitaire', 'Valeur'].join(';')]
   filteredStock.value.forEach(s => csv.push([
+    s.typeMouvement || '',
     s.article?.designation || '',
     s.article?.reference || '',
     s.depot?.nom || '',
     s.depot?.site?.nom || '',
+    formatDate(s.dateMouvement),
     s.methodeValorisation?.code || '',
-    s.quantiteActuelle || 0,
+    s.quantiteStockAvant || 0,
+    s.quantite || 0,
+    s.quantiteStockApres || 0,
     s.prixUnitaire || 0,
     s.valeurTotale || 0
   ].join(';')))
   const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
-  link.download = `valorisation_stock_${new Date().toISOString().split('T')[0]}.csv`
+  link.download = `mouvements_stock_${new Date().toISOString().split('T')[0]}.csv`
   link.click()
 }
 

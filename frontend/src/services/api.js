@@ -130,13 +130,14 @@ export const stockApi = {
   
   // Mouvements
   getMouvements: (articleId, depotId) => {
-    let url = '/stock/mouvements'
+    let url = '/mouvements'
     const params = []
     if (articleId) params.push(`articleId=${articleId}`)
     if (depotId) params.push(`depotId=${depotId}`)
     if (params.length > 0) url += '?' + params.join('&')
     return api.get(url)
   },
+  createMouvement: (data) => api.post('/mouvements', data),
   
   // Entrées/Sorties
   entreeStock: (articleId, depotId, quantite, prixUnitaire, personnelId, reference, numeroLot) => {

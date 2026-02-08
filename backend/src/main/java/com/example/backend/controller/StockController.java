@@ -21,6 +21,7 @@ public class StockController {
     private final DepotRepository depotRepository;
     private final StockRepository stockRepository;
     private final LotStockRepository lotStockRepository;
+    private final MouvementStockRepository mouvementStockRepository;
 
     @GetMapping("/articles")
     public ResponseEntity<List<Article>> getArticles() {
@@ -45,36 +46,39 @@ public class StockController {
     @GetMapping("/valorisation")
     public ResponseEntity<List<Map<String, Object>>> getStockValorise() {
         try {
-            List<Stock> stocks = stockRepository.findAll();
+            // Utiliser la table mouvement_stock pour afficher tous les mouvements (entrées et sorties)
+            List<MouvementStock> mouvements = mouvementStockRepository.findAll().stream()
+                .sorted((m1, m2) -> m2.getDateMouvement().compareTo(m1.getDateMouvement()))
+                .collect(Collectors.toList());
+            
             List<Map<String, Object>> result = new ArrayList<>();
 
-            for (Stock stock : stocks) {
-                if (stock.getQuantiteActuelle().compareTo(BigDecimal.ZERO) <= 0) {
-                    continue; // Skip stocks with zero or negative quantity
+            for (MouvementStock mvt : mouvements) {
+                Map<String, Object> mvtData = new HashMap<>();
+                mvtData.put("id", mvt.getId());
+                mvtData.put("typeMouvement", mvt.getTypeMouvement());
+                mvtData.put("article", mvt.getArticle());
+                mvtData.put("depot", mvt.getDepot());
+                mvtData.put("dateMouvement", mvt.getDateMouvement());
+                
+                // Quantités selon le type
+                if ("ENTREE".equals(mvt.getTypeMouvement())) {
+                    mvtData.put("quantite", mvt.getQuantiteEntree());
+                    mvtData.put("prixUnitaire", mvt.getPrixUnitaireMouvement());
+                    mvtData.put("valeurTotale", mvt.getQuantiteEntree().multiply(mvt.getPrixUnitaireMouvement()));
+                } else {
+                    mvtData.put("quantite", mvt.getQuantiteSortie());
+                    mvtData.put("prixUnitaire", mvt.getPrixUnitaireMouvement());
+                    mvtData.put("valeurTotale", mvt.getQuantiteSortie().multiply(mvt.getPrixUnitaireMouvement()));
                 }
-
-                Map<String, Object> stockData = new HashMap<>();
-                stockData.put("id", stock.getId());
-                stockData.put("article", stock.getArticle());
-                stockData.put("depot", stock.getDepot());
-                stockData.put("quantiteActuelle", stock.getQuantiteActuelle());
+                
+                mvtData.put("quantiteStockAvant", mvt.getQuantiteStockAvant());
+                mvtData.put("quantiteStockApres", mvt.getQuantiteStockApres());
                 
                 // Get valorisation method from depot
-                String methodeCode = stock.getDepot().getMethodeValorisationStock() != null 
-                    ? stock.getDepot().getMethodeValorisationStock().getCode() 
-                    : "CMUP";
-                
-                stockData.put("methodeValorisation", stock.getDepot().getMethodeValorisationStock());
-                
-                // Calculate unit price based on method
-                BigDecimal prixUnitaire = calculatePrixUnitaire(stock, methodeCode);
-                stockData.put("prixUnitaire", prixUnitaire);
-                
-                // Calculate total value
-                BigDecimal valeurTotale = stock.getQuantiteActuelle().multiply(prixUnitaire);
-                stockData.put("valeurTotale", valeurTotale);
+                mvtData.put("methodeValorisation", mvt.getDepot().getMethodeValorisationStock());
 
-                result.add(stockData);
+                result.add(mvtData);
             }
 
             return ResponseEntity.ok(result);
@@ -97,38 +101,22 @@ public class StockController {
                 : BigDecimal.ZERO;
         }
 
-        switch (methode) {
-            case "FIFO":
-                // FIFO: Use oldest lot
-                return lots.stream()
-                    .min(Comparator.comparing(LotStock::getDateEntree))
-                    .map(LotStock::getPrixUnitaireAchat)
-                    .orElse(BigDecimal.ZERO);
-
-            case "LIFO":
-                // LIFO: Use newest lot
-                return lots.stream()
-                    .max(Comparator.comparing(LotStock::getDateEntree))
-                    .map(LotStock::getPrixUnitaireAchat)
-                    .orElse(BigDecimal.ZERO);
-
-            case "CMUP":
-            default:
-                // CMUP: Weighted average
-                BigDecimal totalValue = BigDecimal.ZERO;
-                BigDecimal totalQuantity = BigDecimal.ZERO;
-                
-                for (LotStock lot : lots) {
-                    totalValue = totalValue.add(
-                        lot.getQuantiteRestante().multiply(lot.getPrixUnitaireAchat())
-                    );
-                    totalQuantity = totalQuantity.add(lot.getQuantiteRestante());
-                }
-                
-                if (totalQuantity.compareTo(BigDecimal.ZERO) > 0) {
-                    return totalValue.divide(totalQuantity, 2, RoundingMode.HALF_UP);
-                }
-                return BigDecimal.ZERO;
+        // Pour la valorisation du stock (état), on calcule toujours le coût moyen pondéré
+        // car le stock contient des lots différents avec des prix différents
+        // La méthode FIFO/LIFO/CMUP s'applique lors des SORTIES, pas pour l'évaluation du stock
+        BigDecimal totalValue = BigDecimal.ZERO;
+        BigDecimal totalQuantity = BigDecimal.ZERO;
+        
+        for (LotStock lot : lots) {
+            totalValue = totalValue.add(
+                lot.getQuantiteRestante().multiply(lot.getPrixUnitaireAchat())
+            );
+            totalQuantity = totalQuantity.add(lot.getQuantiteRestante());
         }
+        
+        if (totalQuantity.compareTo(BigDecimal.ZERO) > 0) {
+            return totalValue.divide(totalQuantity, 2, RoundingMode.HALF_UP);
+        }
+        return BigDecimal.ZERO;
     }
 }
