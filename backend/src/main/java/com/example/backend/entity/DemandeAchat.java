@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Entity
@@ -19,15 +20,15 @@ public class DemandeAchat {
     @Column(name = "date_demande")
     private LocalDate dateDemande;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_entreprise", nullable = false)
     private Entreprise entreprise;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_site", nullable = false)
     private Site site;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_depot")
     private Depot depot;
 
@@ -37,10 +38,13 @@ public class DemandeAchat {
     @Column(name = "motif_achat", columnDefinition = "TEXT")
     private String motifAchat;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_status", nullable = false)
     private Status status;
 
     @Column(name = "date_creation")
     private LocalDateTime dateCreation;
+
+    @OneToMany(mappedBy = "demandeAchat", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private List<DemandeAchatDetails> details;
 }

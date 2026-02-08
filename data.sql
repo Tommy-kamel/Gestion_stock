@@ -71,7 +71,7 @@ INSERT INTO site (nom, adresse, telephone, email, id_entreprise) VALUES
 -- ------------------------------------------------------------------------------
 INSERT INTO depot (nom, adresse, id_site, id_methode_valorisation_stock) VALUES
 ('Depot Principal A', '123 Rue de l''Industrie, Ville A', 1, 1),
-('Depot Secondaire A', '789 Boulevard Industriel, Ville A', 2, 1),
+('Depot Secondaire A', '789 Boulevard Industriel, Ville A', 2, 3),
 ('Depot Principal B', '456 Avenue du Commerce, Ville B', 3, 2);
 
 -- ------------------------------------------------------------------------------
@@ -155,17 +155,17 @@ INSERT INTO demande_achat_details (id_demande_achat, id_article, quantite_demand
 -- ------------------------------------------------------------------------------
 -- 17. PROFORMAS FOURNISSEURS (À INSeRER)
 -- ------------------------------------------------------------------------------
-INSERT INTO proforma_fournisseur (numero_proforma, date_emission, date_validite, id_fournisseur, montant_ttc, id_demande_achat) VALUES
-('PF-2024-001', '2024-01-16', '2024-02-16', 1, 12750.00, 1),
-('PF-2024-002', '2024-01-21', '2024-02-21', 3, 5000.00, 2);
+-- INSERT INTO proforma_fournisseur (numero_proforma, date_emission, date_validite, id_fournisseur, montant_ttc, id_demande_achat) VALUES
+-- ('PF-2024-001', '2024-01-16', '2024-02-16', 1, 12750.00, 1),
+-- ('PF-2024-002', '2024-01-21', '2024-02-21', 3, 5000.00, 2);
 
 -- ------------------------------------------------------------------------------
 -- 18. DeTAILS PROFORMAS FOURNISSEURS (À INSeRER)
 -- ------------------------------------------------------------------------------
-INSERT INTO proforma_fournisseur_details (id_proforma_fournisseur, id_article, quantite, prix_unitaire) VALUES
-(1, 1, 300.00, 25.50),
-(1, 2, 100.00, 45.00),
-(2, 7, 2.00, 2500.00);
+-- INSERT INTO proforma_fournisseur_details (id_proforma_fournisseur, id_article, quantite, prix_unitaire) VALUES
+-- (1, 1, 300.00, 25.50),
+-- (1, 2, 100.00, 45.00),
+-- (2, 7, 2.00, 2500.00);
 
 -- ------------------------------------------------------------------------------
 -- 19. BONS DE COMMANDE ACHAT (À INSeRER)
@@ -246,8 +246,8 @@ INSERT INTO facture_vente_details (id_facture_vente, id_article, quantite, prix_
 -- 29. CAISSES (À INSeRER)
 -- ------------------------------------------------------------------------------
 INSERT INTO caisse (code_caisse, libelle, solde_actuel, entreprise_id) VALUES
-('CAISSE_A', 'Caisse Entreprise A', 10000.00, 1),
-('CAISSE_B', 'Caisse Entreprise B', 5000.00, 2);
+('CAISSE_A', 'Caisse Entreprise A', 10000000000.00, 1),
+('CAISSE_B', 'Caisse Entreprise B', 5000000000.00, 2);
 
 -- ------------------------------------------------------------------------------
 -- 30. MOUVEMENTS CAISSE (À INSeRER)
@@ -277,13 +277,13 @@ INSERT INTO paiement_vente_details (id_paiement_vente, montant) VALUES
 -- ------------------------------------------------------------------------------
 -- 33. PAIEMENTS ACHAT (À INSeRER)
 -- ------------------------------------------------------------------------------
-INSERT INTO paiement_achat (numero_paiement, date_paiement, id_facture_achat, id_caisse_mouvement, montant_total_paye) VALUES
-('PAI-2024-001', '2024-02-03', 1, 3, 12750.00),
-('PAI-2024-002', '2024-02-07', 2, 4, 5000.00);
+-- INSERT INTO paiement_achat (numero_paiement, date_paiement, id_facture_achat, id_caisse_mouvement, montant_total_paye) VALUES
+-- ('PAI-2024-001', '2024-02-03', 1, 3, 12750.00),
+-- ('PAI-2024-002', '2024-02-07', 2, 4, 5000.00);
 
--- ------------------------------------------------------------------------------
--- 34. DeTAILS PAIEMENTS ACHAT (À INSeRER)
--- ------------------------------------------------------------------------------
-INSERT INTO paiement_achat_details (id_paiement_achat, montant, reference_externe) VALUES
-(1, 12750.00, 'VIR-2024-001'),
-(2, 5000.00, 'CHQ-2024-001');
+-- -- ------------------------------------------------------------------------------
+-- -- 34. DeTAILS PAIEMENTS ACHAT (À INSeRER)
+-- -- ------------------------------------------------------------------------------
+-- INSERT INTO paiement_achat_details (id_paiement_achat, montant, reference_externe) VALUES
+-- (1, 12750.00, 'VIR-2024-001'),
+-- (2, 5000.00, 'CHQ-2024-001');

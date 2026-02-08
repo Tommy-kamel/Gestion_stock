@@ -197,6 +197,9 @@ CREATE TABLE proforma_fournisseur (
     FOREIGN KEY (id_demande_achat) REFERENCES demande_achat(id)
 );
 
+ALTER TABLE proforma_fournisseur ADD column id_status INTEGER NOT NULL;
+ALTER TABLE proforma_fournisseur ADD FOREIGN KEY (id_status) REFERENCES status(id);
+
 CREATE TABLE proforma_fournisseur_details (
     id                   SERIAL PRIMARY KEY,
     id_proforma_fournisseur INTEGER NOT NULL,
@@ -241,6 +244,9 @@ CREATE TABLE facture_achat (
     FOREIGN KEY (id_status)                REFERENCES status(id),
     FOREIGN KEY (id_client) REFERENCES client(id)
 );
+
+ALTER TABLE facture_achat DROP COLUMN id_client;
+ALTER TABLE facture_achat DROP COLUMN reste_a_payer;
 
 CREATE TABLE facture_achat_details (
     id              SERIAL PRIMARY KEY,
@@ -382,3 +388,22 @@ CREATE TABLE paiement_achat_details (
     reference_externe VARCHAR(100),
     FOREIGN KEY (id_paiement_achat) REFERENCES paiement_achat(id) ON DELETE CASCADE
 );
+
+-- ----------------------------------------------------------------------------- 
+-- VUES
+-- -----------------------------------------------------------------------------
+
+CREATE VIEW depot_valorisation AS
+SELECT 
+    d.id,
+    d.nom AS depot_nom,
+    d.adresse AS depot_adresse,
+    s.nom AS site_nom,
+    e.nom AS entreprise_nom,
+    m.code AS methode_code,
+    m.libelle AS methode_libelle,
+    m.description AS methode_description
+FROM depot d
+JOIN site s ON d.id_site = s.id
+JOIN entreprise e ON s.id_entreprise = e.id
+JOIN methode_valorisation_stock m ON d.id_methode_valorisation_stock = m.id;

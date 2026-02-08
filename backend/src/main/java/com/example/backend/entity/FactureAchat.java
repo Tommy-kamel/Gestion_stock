@@ -27,13 +27,6 @@ public class FactureAchat {
     @JoinColumn(name = "id_status", nullable = false)
     private Status status;
 
-    @ManyToOne
-    @JoinColumn(name = "id_client", nullable = false)
-    private Client client;
-
     @Column(name = "montant_ttc", precision = 15, scale = 2, nullable = false)
     private BigDecimal montantTtc;
-
-    @Column(name = "reste_a_payer", precision = 15, scale = 2, nullable = false)
-    private BigDecimal resteAPayer;
 }

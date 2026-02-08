@@ -5,299 +5,326 @@
         <h1 class="text-2xl font-bold text-gray-900">Proformas fournisseurs</h1>
         <p class="mt-1 text-sm text-gray-500">Gestion des proformas reçus des fournisseurs</p>
       </div>
+      <button @click="openModal" class="btn-primary">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        Nouveau proforma
+      </button>
     </div>
 
-    <!-- Liste des DA en attente de proformas -->
+    <!-- Liste des proformas -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Demandes en attente de proformas</h2>
-      <div class="space-y-4">
-        <div v-for="da in demandesEnAttente" :key="da.id" 
-             class="border border-gray-200 rounded-lg p-4 hover:border-indigo-300 cursor-pointer"
-             @click="selectDemande(da)">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="font-medium text-gray-900">{{ da.numeroDa }}</p>
-              <p class="text-sm text-gray-500">{{ formatDate(da.dateDemande) }}</p>
-            </div>
-            <div class="text-right">
-              <span class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
-                {{ da.proformas?.length || 0 }} proforma(s)
-              </span>
-              <p class="text-sm text-gray-500 mt-1">Min. 3 requis</p>
-            </div>
-          </div>
-        </div>
-        <div v-if="demandesEnAttente.length === 0" class="text-center text-gray-500 py-8">
-          Aucune demande en attente de proformas
-        </div>
-      </div>
-    </div>
-
-    <!-- Détail DA sélectionnée -->
-    <div v-if="selectedDa" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-lg font-semibold text-gray-900">{{ selectedDa.numeroDa }}</h2>
-          <p class="text-sm text-gray-500">Articles demandés</p>
-        </div>
-        <button @click="showAddProformaModal = true" class="btn-primary">
-          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-          </svg>
-          Ajouter proforma
-        </button>
-      </div>
-
-      <!-- Articles de la DA -->
-      <div class="mb-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Tous les proformas</h2>
+      <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Article</th>
-              <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Quantité</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">N° Proforma</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fournisseur</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">DA</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Montant TTC</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date émission</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date validité</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-200">
-            <tr v-for="detail in selectedDa.details" :key="detail.id">
-              <td class="px-4 py-2 text-sm">{{ detail.article?.designation }}</td>
-              <td class="px-4 py-2 text-sm">{{ detail.quantite }}</td>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <tr v-for="proforma in proformas" :key="proforma.id" class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ proforma.numeroProforma }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ proforma.fournisseur?.nom }}</td>
+              <td class="px-6 py-4 text-sm text-gray-700">{{ proforma.demandeAchat?.numeroDa }}</td>
+              <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ formatCurrency(proforma.montantTtc) }}</td>
+              <td class="px-6 py-4 text-sm text-gray-500">{{ formatDate(proforma.dateEmission) }}</td>
+              <td class="px-6 py-4 text-sm text-gray-500">{{ formatDate(proforma.dateValidite) }}</td>
+              <td class="px-6 py-4">
+                <span v-if="proforma.status?.code === 'VALIDE'" class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+                  {{ proforma.status?.libelle }}
+                </span>
+                <span v-else-if="proforma.status?.code === 'ANNULE'" class="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">
+                  {{ proforma.status?.libelle }}
+                </span>
+                <span v-else class="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800">
+                  {{ proforma.status?.libelle || 'Brouillon' }}
+                </span>
+              </td>
+            </tr>
+            <tr v-if="proformas.length === 0">
+              <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                Aucun proforma
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
-
-      <!-- Proformas reçues -->
-      <div>
-        <h3 class="font-medium text-gray-900 mb-4">Proformas reçues ({{ proformas.length }}/3 minimum)</h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div v-for="proforma in proformas" :key="proforma.id" 
-               :class="['border rounded-lg p-4', proforma.estSelectionne ? 'border-green-500 bg-green-50' : 'border-gray-200']">
-            <div class="flex items-center justify-between mb-2">
-              <span class="font-medium text-gray-900">{{ proforma.fournisseur?.nom }}</span>
-              <span v-if="proforma.estSelectionne" class="px-2 py-1 text-xs bg-green-500 text-white rounded-full">
-                Meilleur prix
-              </span>
-              <span v-else class="text-sm text-gray-500">Rang #{{ proforma.rangPrix }}</span>
-            </div>
-            <div class="space-y-1 text-sm">
-              <p><span class="text-gray-500">N° Proforma:</span> {{ proforma.numeroProforma }}</p>
-              <p><span class="text-gray-500">Montant HT:</span> {{ formatMontant(proforma.montantHt) }} MGA</p>
-              <p><span class="text-gray-500">Montant TTC:</span> {{ formatMontant(proforma.montantTtc) }} MGA</p>
-              <p><span class="text-gray-500">Délai:</span> {{ proforma.delaiLivraison }} jours</p>
-            </div>
-          </div>
-        </div>
-        <div v-if="proformas.length === 0" class="text-center text-gray-500 py-8 border-2 border-dashed rounded-lg">
-          Aucune proforma reçue. Cliquez sur "Ajouter proforma" pour commencer.
-        </div>
-      </div>
-
-      <!-- Action validation -->
-      <div v-if="proformas.length >= 3" class="mt-6 pt-6 border-t">
-        <div class="flex items-center justify-between">
-          <p class="text-sm text-green-600">
-            ✓ Minimum de 3 proformas atteint. Le système a sélectionné le meilleur prix.
-          </p>
-          <button @click="envoyerValidationFinance" class="btn-primary">
-            Envoyer pour validation finance
-          </button>
-        </div>
-      </div>
     </div>
 
-    <!-- Modal ajout proforma -->
-    <div v-if="showAddProformaModal" class="fixed inset-0 z-50 overflow-y-auto">
-      <div class="flex items-center justify-center min-h-screen px-4">
-        <div class="fixed inset-0 bg-black bg-opacity-50" @click="showAddProformaModal = false"></div>
-        <div class="relative bg-white rounded-xl shadow-xl max-w-2xl w-full p-6">
-          <h3 class="text-lg font-semibold text-gray-900 mb-4">Ajouter une proforma fournisseur</h3>
-          
-          <form @submit.prevent="ajouterProforma" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Fournisseur</label>
-                <select v-model="newProforma.fournisseurId" required class="w-full border-gray-300 rounded-lg">
-                  <option value="">Sélectionner</option>
-                  <option v-for="f in fournisseurs" :key="f.id" :value="f.id">{{ f.nom }}</option>
-                </select>
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">N° Proforma</label>
-                <input v-model="newProforma.numeroProforma" type="text" required class="w-full border-gray-300 rounded-lg">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date proforma</label>
-                <input v-model="newProforma.dateProforma" type="date" required class="w-full border-gray-300 rounded-lg">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Date validité</label>
-                <input v-model="newProforma.dateValidite" type="date" required class="w-full border-gray-300 rounded-lg">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Délai livraison (jours)</label>
-                <input v-model.number="newProforma.delaiLivraison" type="number" min="1" required class="w-full border-gray-300 rounded-lg">
-              </div>
-              <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Conditions paiement</label>
-                <input v-model="newProforma.conditionsPaiement" type="text" class="w-full border-gray-300 rounded-lg">
-              </div>
+    <!-- Modal Nouveau Proforma -->
+    <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+          <h3 class="text-xl font-semibold text-gray-900">Nouveau proforma fournisseur</h3>
+          <button @click="closeModal" class="text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <form @submit.prevent="submitProforma" class="p-6 space-y-6">
+          <!-- Informations générales -->
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Demande d'achat *</label>
+              <select v-model="form.demandeAchatId" required 
+                      class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                      @change="loadDemandeDetails">
+                <option value="">Sélectionner une DA</option>
+                <option v-for="da in demandesAchats" :key="da.id" :value="da.id">
+                  {{ da.numeroDa }} - {{ formatDate(da.dateDemande) }}
+                </option>
+              </select>
             </div>
 
-            <!-- Détails articles avec prix -->
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Prix par article</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Fournisseur *</label>
+              <select v-model="form.fournisseurId" required 
+                      class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500">
+                <option value="">Sélectionner un fournisseur</option>
+                <option v-for="f in fournisseurs" :key="f.id" :value="f.id">
+                  {{ f.nom }}
+                </option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">N° Proforma *</label>
+              <input v-model="form.numeroProforma" type="text" required
+                     class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                     placeholder="PF2024-001" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Date d'émission *</label>
+              <input v-model="form.dateEmission" type="date" required
+                     class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500" />
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Durée de validité (jours) *</label>
+              <input v-model.number="form.dureeValidite" type="number" required min="1"
+                     class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                     placeholder="30" />
+            </div>
+          </div>
+
+          <!-- Articles et prix -->
+          <div v-if="selectedDemande" class="border-t pt-6">
+            <h4 class="text-lg font-semibold text-gray-900 mb-4">Articles et prix unitaires</h4>
+            <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Article</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Qté</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500">Prix unitaire</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Article</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Quantité</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Prix unitaire *</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
                   </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-200">
-                  <tr v-for="(detail, index) in newProforma.details" :key="index">
-                    <td class="px-4 py-2 text-sm">{{ detail.article?.designation }}</td>
-                    <td class="px-4 py-2 text-sm">{{ detail.quantite }}</td>
-                    <td class="px-4 py-2">
-                      <input v-model.number="detail.prixUnitaire" type="number" min="0" step="0.01" required
-                             class="w-32 border-gray-300 rounded-lg text-sm">
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <tr v-for="(detail, index) in form.details" :key="index">
+                    <td class="px-4 py-3 text-sm">{{ detail.articleDesignation }}</td>
+                    <td class="px-4 py-3 text-sm">{{ detail.quantite }}</td>
+                    <td class="px-4 py-3">
+                      <input v-model.number="detail.prixUnitaire" type="number" step="0.01" required min="0"
+                             @input="calculateLineTotal(index)"
+                             class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                             placeholder="0.00" />
+                    </td>
+                    <td class="px-4 py-3 text-sm font-semibold">
+                      {{ formatCurrency(detail.prixUnitaire * detail.quantite) }}
                     </td>
                   </tr>
                 </tbody>
+                <tfoot class="bg-gray-50">
+                  <tr>
+                    <td colspan="3" class="px-4 py-3 text-right font-semibold text-gray-900">Total:</td>
+                    <td class="px-4 py-3 text-lg font-bold text-indigo-600">{{ formatCurrency(totalMontant) }}</td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
+          </div>
 
-            <div class="flex justify-end space-x-3 pt-4">
-              <button type="button" @click="showAddProformaModal = false" class="btn-secondary">Annuler</button>
-              <button type="submit" class="btn-primary">Enregistrer</button>
-            </div>
-          </form>
-        </div>
+          <!-- Actions -->
+          <div class="flex items-center justify-end gap-3 pt-4 border-t">
+            <button type="button" @click="closeModal" 
+                    class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+              Annuler
+            </button>
+            <button type="submit" 
+                    class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-medium">
+              Créer le proforma
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue'
-import { achatApi, referenceApi } from '@/services/api'
+import { ref, onMounted, computed } from 'vue';
+import { achatApi, referenceApi } from '@/services/api';
 
-const demandesEnAttente = ref([])
-const selectedDa = ref(null)
-const proformas = ref([])
-const fournisseurs = ref([])
-const showAddProformaModal = ref(false)
+const proformas = ref([]);
+const demandesAchats = ref([]);
+const fournisseurs = ref([]);
+const showModal = ref(false);
+const selectedDemande = ref(null);
 
-const newProforma = reactive({
+const form = ref({
+  demandeAchatId: '',
   fournisseurId: '',
   numeroProforma: '',
-  dateProforma: new Date().toISOString().split('T')[0],
-  dateValidite: '',
-  delaiLivraison: 7,
-  conditionsPaiement: '',
+  dateEmission: new Date().toISOString().split('T')[0],
+  dureeValidite: 30,
   details: []
-})
+});
 
-const formatDate = (date) => {
-  if (!date) return ''
-  return new Date(date).toLocaleDateString('fr-FR')
-}
+const totalMontant = computed(() => {
+  return form.value.details.reduce((sum, detail) => {
+    return sum + (detail.prixUnitaire * detail.quantite || 0);
+  }, 0);
+});
 
-const formatMontant = (montant) => {
-  if (!montant) return '0'
-  return new Intl.NumberFormat('fr-FR').format(montant)
-}
+onMounted(async () => {
+  await loadData();
+});
 
-const selectDemande = (da) => {
-  selectedDa.value = da
-  loadProformas(da.id)
-  // Préparer les détails pour le formulaire proforma
-  newProforma.details = (da.details || []).map(d => ({
-    articleId: d.article?.id,
-    article: d.article,
-    quantite: d.quantite,
-    prixUnitaire: 0
-  }))
-}
-
-const loadProformas = async (daId) => {
+async function loadData() {
   try {
-    const response = await achatApi.getProformas(daId)
-    proformas.value = response.data || []
+    const [proformasRes, demandesRes, fournisseursRes] = await Promise.all([
+      achatApi.getAllProformas(),
+      achatApi.getDemandesAchat(),
+      referenceApi.getFournisseurs()
+    ]);
+    
+    // Afficher tous les proformas (pas de filtre)
+    proformas.value = proformasRes.data;
+    
+    // Filtrer les DAs avec statut VALIDE (validées, en attente de proformas)
+    demandesAchats.value = demandesRes.data.filter(da => da.status?.code === 'VALIDE');
+    fournisseurs.value = fournisseursRes.data;
   } catch (error) {
-    console.error('Erreur chargement proformas:', error)
-    proformas.value = []
+    console.error('Erreur lors du chargement des données:', error);
+    alert('Erreur lors du chargement des données');
   }
 }
 
-const ajouterProforma = async () => {
+function openModal() {
+  showModal.value = true;
+  form.value = {
+    demandeAchatId: '',
+    fournisseurId: '',
+    numeroProforma: '',
+    dateEmission: new Date().toISOString().split('T')[0],
+    dureeValidite: 5,
+    details: []
+  };
+  selectedDemande.value = null;
+}
+
+function closeModal() {
+  showModal.value = false;
+  selectedDemande.value = null;
+}
+
+async function loadDemandeDetails() {
+  if (!form.value.demandeAchatId) {
+    selectedDemande.value = null;
+    form.value.details = [];
+    return;
+  }
+
   try {
-    const data = {
-      fournisseurId: newProforma.fournisseurId,
-      numeroProforma: newProforma.numeroProforma,
-      dateProforma: newProforma.dateProforma,
-      dateValidite: newProforma.dateValidite,
-      delaiLivraison: newProforma.delaiLivraison,
-      conditionsPaiement: newProforma.conditionsPaiement,
-      details: newProforma.details.map(d => ({
-        articleId: d.articleId,
-        quantite: d.quantite,
-        prixUnitaire: d.prixUnitaire
-      }))
+    const response = await achatApi.getDemandeAchat(form.value.demandeAchatId);
+    selectedDemande.value = response.data;
+    
+    // Initialiser les détails du proforma avec les articles de la DA
+    form.value.details = selectedDemande.value.details.map(detail => ({
+      articleId: detail.article.id,
+      articleDesignation: detail.article.designation,
+      quantite: detail.quantiteDemandee || detail.quantite || 0,
+      prixUnitaire: 0
+    }));
+  } catch (error) {
+    console.error('Erreur lors du chargement de la demande:', error);
+    alert('Erreur lors du chargement des détails de la demande');
+  }
+}
+
+function calculateLineTotal(index) {
+  // Trigger reactivity for computed total
+  form.value.details[index] = { ...form.value.details[index] };
+}
+
+async function submitProforma() {
+  try {
+    // Validation
+    if (!form.value.demandeAchatId || !form.value.fournisseurId) {
+      alert('Veuillez remplir tous les champs obligatoires');
+      return;
     }
-    await achatApi.ajouterProforma(selectedDa.value.id, data)
-    showAddProformaModal.value = false
-    loadProformas(selectedDa.value.id)
+
+    const hasInvalidPrices = form.value.details.some(d => !d.prixUnitaire || d.prixUnitaire <= 0);
+    if (hasInvalidPrices) {
+      alert('Veuillez saisir tous les prix unitaires');
+      return;
+    }
+
+    // Préparer les données pour l'API
+    const payload = {
+      demandeAchatId: parseInt(form.value.demandeAchatId),
+      fournisseurId: parseInt(form.value.fournisseurId),
+      numeroProforma: form.value.numeroProforma,
+      dateEmission: form.value.dateEmission,
+      dureeValidite: form.value.dureeValidite,
+      details: form.value.details.map(d => ({
+        articleId: d.articleId,
+        quantite: parseFloat(d.quantite) || 0,
+        prixUnitaire: parseFloat(d.prixUnitaire) || 0
+      }))
+    };
+
+    await achatApi.creerProforma(payload);
+    alert('Proforma créé avec succès');
+    closeModal();
+    await loadData();
   } catch (error) {
-    console.error('Erreur ajout proforma:', error)
-    alert('Erreur lors de l\'ajout')
+    console.error('Erreur lors de la création du proforma:', error);
+    alert('Erreur lors de la création du proforma: ' + (error.response?.data?.message || error.message));
   }
 }
 
-const envoyerValidationFinance = async () => {
-  if (confirm('Envoyer pour validation finance ?')) {
-    // La DA sera mise à jour côté serveur
-    alert('Demande envoyée pour validation finance')
-    loadDemandes()
-  }
+function formatDate(dateString) {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('fr-FR');
 }
 
-const loadDemandes = async () => {
-  try {
-    const response = await achatApi.getDemandesAchat()
-    demandesEnAttente.value = (response.data || []).filter(da => 
-      ['APPROUVE', 'EN_ATTENTE_PROFORMA', 'PROFORMAS_SAISIS'].includes(da.statut?.code)
-    )
-  } catch (error) {
-    console.error('Erreur chargement demandes:', error)
-    demandesEnAttente.value = []
-  }
+function formatCurrency(amount) {
+  if (!amount && amount !== 0) return '0 Ar';
+  return new Intl.NumberFormat('fr-FR', {
+    style: 'decimal',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2
+  }).format(amount) + ' Ar';
 }
-
-const loadFournisseurs = async () => {
-  try {
-    const response = await referenceApi.getFournisseurs()
-    fournisseurs.value = response.data || []
-  } catch (error) {
-    fournisseurs.value = [
-      { id: 2, nom: 'Fournisseur Papeterie Plus' },
-      { id: 3, nom: 'Fournisseur Tech Solutions' },
-      { id: 4, nom: 'Fournisseur Bureau Pro' }
-    ]
-  }
-}
-
-onMounted(() => {
-  loadDemandes()
-  loadFournisseurs()
-})
 </script>
 
 <style scoped>
 .btn-primary {
   @apply inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors;
-}
-.btn-secondary {
-  @apply inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-colors;
 }
 </style>

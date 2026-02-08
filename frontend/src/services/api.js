@@ -39,21 +39,25 @@ export const achatApi = {
   getDemandesAchat: () => api.get('/achats/demandes'),
   getDemandeAchat: (id) => api.get(`/achats/demandes/${id}`),
   creerDemandeAchat: (data) => api.post('/achats/demandes', data),
+  validerDemandeAchat: (id) => api.put(`/achats/demandes/${id}/valider`),
   soumettreDemandeAchat: (id) => api.post(`/achats/demandes/${id}/soumettre`),
   approuverDemandeAchat: (id, personnelId) => api.post(`/achats/demandes/${id}/approuver?personnelId=${personnelId}`),
   
   // Proformas
-  getProformas: (demandeId) => api.get(`/achats/demandes/${demandeId}/proformas`),
-  ajouterProforma: (demandeId, data) => api.post(`/achats/demandes/${demandeId}/proformas`, data),
+  getProformas: (demandeId) => api.get(`/proformas/demande/${demandeId}`),
+  getAllProformas: () => api.get('/proformas'),
+  creerProforma: (data) => api.post('/proformas', data),
+  selectionnerMeilleurProforma: (demandeId) => api.post(`/proformas/demande/${demandeId}/selectionner-meilleur`),
   
   // Validation finance
   validerFinance: (demandeId, personnelId) => api.post(`/achats/demandes/${demandeId}/valider-finance?personnelId=${personnelId}`),
   rejeterFinance: (demandeId, personnelId, motif) => api.post(`/achats/demandes/${demandeId}/rejeter-finance?personnelId=${personnelId}&motif=${motif}`),
   
   // Bons de commande
-  getBonsCommande: () => api.get('/achats/bons-commande'),
-  creerBonCommande: (demandeId, personnelId) => api.post(`/achats/demandes/${demandeId}/bon-commande?personnelId=${personnelId}`),
-  signerBonCommande: (bcId, personnelId) => api.post(`/achats/bons-commande/${bcId}/signer?personnelId=${personnelId}`),
+  getBonsCommande: () => api.get('/bons-commande-achat'),
+  getBonCommande: (id) => api.get(`/bons-commande-achat/${id}`),
+  creerBonCommande: (data) => api.post('/bons-commande-achat', data),
+  livrerEtPayerBonCommande: (id, data) => api.post(`/bons-commande-achat/${id}/livrer-et-payer`, data),
   
   // Bons de livraison
   getBonsLivraison: () => api.get('/achats/bons-livraison'),
@@ -210,7 +214,7 @@ export const referenceApi = {
   // Entreprises
   getEntreprises: () => api.get('/references/entreprises'),
   getEntreprisesInternes: () => api.get('/references/entreprises/internes'),
-  getFournisseurs: () => api.get('/references/entreprises/fournisseurs'),
+  getFournisseurs: () => api.get('/references/fournisseurs'),
   getClients: () => api.get('/references/entreprises/clients'),
   
   // Personnel

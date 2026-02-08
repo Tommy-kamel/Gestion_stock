@@ -26,18 +26,6 @@ const LotsView = () => import('@/views/stock/LotsView.vue')
 const MouvementsView = () => import('@/views/stock/MouvementsView.vue')
 const DepotsView = () => import('@/views/stock/DepotsView.vue')
 
-// Finances
-const ValidationFinanceView = () => import('@/views/finances/ValidationFinanceView.vue')
-const CaissesView = () => import('@/views/finances/CaissesView.vue')
-const PaiementsAchatView = () => import('@/views/finances/PaiementsAchatView.vue')
-const PaiementsVenteView = () => import('@/views/finances/PaiementsVenteView.vue')
-
-// Référentiel
-const EntreprisesView = () => import('@/views/referentiel/EntreprisesView.vue')
-const FournisseursView = () => import('@/views/referentiel/FournisseursView.vue')
-const ClientsView = () => import('@/views/referentiel/ClientsView.vue')
-const PersonnelView = () => import('@/views/referentiel/PersonnelView.vue')
-
 const routes = [
   {
     path: '/login',
@@ -146,58 +134,6 @@ const routes = [
     name: 'depots',
     component: DepotsView,
     meta: { requiresAuth: true, title: 'Dépôts' }
-  },
-  
-  // ===================== FINANCES =====================
-  {
-    path: '/finances/validation',
-    name: 'validation-finance',
-    component: ValidationFinanceView,
-    meta: { requiresAuth: true, title: 'Validation demandes' }
-  },
-  {
-    path: '/finances/caisses',
-    name: 'caisses',
-    component: CaissesView,
-    meta: { requiresAuth: true, title: 'Caisses' }
-  },
-  {
-    path: '/finances/paiements-achats',
-    name: 'paiements-achats',
-    component: PaiementsAchatView,
-    meta: { requiresAuth: true, title: 'Paiements fournisseurs' }
-  },
-  {
-    path: '/finances/paiements-ventes',
-    name: 'paiements-ventes',
-    component: PaiementsVenteView,
-    meta: { requiresAuth: true, title: 'Encaissements clients' }
-  },
-  
-  // ===================== RÉFÉRENTIEL =====================
-  {
-    path: '/referentiel/entreprises',
-    name: 'entreprises',
-    component: EntreprisesView,
-    meta: { requiresAuth: true, title: 'Entreprises' }
-  },
-  {
-    path: '/referentiel/fournisseurs',
-    name: 'fournisseurs',
-    component: FournisseursView,
-    meta: { requiresAuth: true, title: 'Fournisseurs' }
-  },
-  {
-    path: '/referentiel/clients',
-    name: 'clients',
-    component: ClientsView,
-    meta: { requiresAuth: true, title: 'Clients' }
-  },
-  {
-    path: '/referentiel/personnel',
-    name: 'personnel',
-    component: PersonnelView,
-    meta: { requiresAuth: true, title: 'Personnel' }
   },
   
   // Catch-all redirect

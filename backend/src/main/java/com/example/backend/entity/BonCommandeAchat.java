@@ -2,6 +2,7 @@ package com.example.backend.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -19,11 +20,12 @@ public class BonCommandeAchat {
     @Column(name = "date_commande")
     private LocalDate dateCommande;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_proforma_fournisseur")
+    @JsonIgnoreProperties({"demandeAchat", "details"})
     private ProformaFournisseur proformaFournisseur;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_status", nullable = false)
     private Status status;
 
