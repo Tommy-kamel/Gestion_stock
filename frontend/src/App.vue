@@ -238,14 +238,18 @@
           </main>
         </div>
       </div>
+
+      <!-- Chatbot IA -->
+      <Chatbot />
     </template>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch, reactive } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { ref, reactive, computed, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import Chatbot from '@/components/Chatbot.vue'
 
 const router = useRouter()
 const route = useRoute()
