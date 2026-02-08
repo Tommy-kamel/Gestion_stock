@@ -151,29 +151,46 @@ public class MouvementStockController {
         List<LotStock> lots = lotStockRepository.findByArticleAndDepotAndQuantiteRestanteGreaterThan(
                 article, depot, BigDecimal.ZERO);
 
-        // Sort lots according to valuation method
-        if ("FIFO".equals(methodeValorisation)) {
-            lots.sort(Comparator.comparing(LotStock::getDateEntree));
-        } else if ("LIFO".equals(methodeValorisation)) {
-            lots.sort(Comparator.comparing(LotStock::getDateEntree).reversed());
-        }
-
-        // Calculate weighted average price based on actual quantities that will be deducted
+        // Calculate weighted average price based on valuation method
         BigDecimal prixUnitaire;
-        BigDecimal totalValue = BigDecimal.ZERO;
-        BigDecimal quantiteCalculee = detail.getQuantite();
         
-        for (LotStock lot : lots) {
-            if (quantiteCalculee.compareTo(BigDecimal.ZERO) <= 0) break;
+        if ("CMUP".equals(methodeValorisation)) {
+            // For CMUP: calculate average of ALL available stock
+            BigDecimal totalValue = lots.stream()
+                    .map(lot -> lot.getQuantiteRestante().multiply(lot.getPrixUnitaireAchat()))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalQuantity = lots.stream()
+                    .map(LotStock::getQuantiteRestante)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            prixUnitaire = totalQuantity.compareTo(BigDecimal.ZERO) > 0 
+                    ? totalValue.divide(totalQuantity, 2, BigDecimal.ROUND_HALF_UP) 
+                    : BigDecimal.ZERO;
             
-            BigDecimal quantiteAUtiliser = quantiteCalculee.min(lot.getQuantiteRestante());
-            totalValue = totalValue.add(quantiteAUtiliser.multiply(lot.getPrixUnitaireAchat()));
-            quantiteCalculee = quantiteCalculee.subtract(quantiteAUtiliser);
+            // For deduction, use FIFO order (but price is CMUP)
+            lots.sort(Comparator.comparing(LotStock::getDateEntree));
+        } else {
+            // For FIFO/LIFO: sort lots and calculate weighted average of deducted quantities
+            if ("FIFO".equals(methodeValorisation)) {
+                lots.sort(Comparator.comparing(LotStock::getDateEntree));
+            } else if ("LIFO".equals(methodeValorisation)) {
+                lots.sort(Comparator.comparing(LotStock::getDateEntree).reversed());
+            }
+            
+            BigDecimal totalValue = BigDecimal.ZERO;
+            BigDecimal quantiteCalculee = detail.getQuantite();
+            
+            for (LotStock lot : lots) {
+                if (quantiteCalculee.compareTo(BigDecimal.ZERO) <= 0) break;
+                
+                BigDecimal quantiteAUtiliser = quantiteCalculee.min(lot.getQuantiteRestante());
+                totalValue = totalValue.add(quantiteAUtiliser.multiply(lot.getPrixUnitaireAchat()));
+                quantiteCalculee = quantiteCalculee.subtract(quantiteAUtiliser);
+            }
+            
+            prixUnitaire = detail.getQuantite().compareTo(BigDecimal.ZERO) > 0 
+                    ? totalValue.divide(detail.getQuantite(), 2, BigDecimal.ROUND_HALF_UP) 
+                    : BigDecimal.ZERO;
         }
-        
-        prixUnitaire = detail.getQuantite().compareTo(BigDecimal.ZERO) > 0 
-                ? totalValue.divide(detail.getQuantite(), 2, BigDecimal.ROUND_HALF_UP) 
-                : BigDecimal.ZERO;
 
         // Create mouvement
         MouvementStock mouvement = new MouvementStock();

@@ -132,9 +132,9 @@
                 <!-- <router-link to="/stock/articles" class="nav-sublink" active-class="active">
                   Articles
                 </router-link> -->
-                <router-link to="/stock/lots" class="nav-sublink" active-class="active">
+                <!-- <router-link to="/stock/lots" class="nav-sublink" active-class="active">
                   Lots
-                </router-link>
+                </router-link> -->
                 <!-- <router-link to="/stock/depots" class="nav-sublink" active-class="active">
                   Dépôts
                 </router-link> -->
