@@ -79,6 +79,9 @@ public class AchatController {
     @Autowired
     private com.example.backend.repository.ArticleRepository articleRepository;
 
+    @Autowired
+    private com.example.backend.repository.StatusRepository statusRepository;
+
     @PostMapping("/demandes")
     public ResponseEntity<DemandeAchat> createDemandeAchat(@RequestBody CreateDemandeAchatRequest request) {
         try {
@@ -213,6 +216,66 @@ public class AchatController {
                 status.setCode("VALIDE");
                 status.setLibelle("Valide");
                 demandeAchat.setStatus(status);
+                
+                return ResponseEntity.ok(demandeAchatService.save(demandeAchat));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/demandes/{id}/soumettre")
+    public ResponseEntity<DemandeAchat> soumettreDemandeAchat(@PathVariable("id") Long id) {
+        try {
+            Optional<DemandeAchat> demandeAchatData = demandeAchatService.findById(id);
+            
+            if (demandeAchatData.isPresent()) {
+                DemandeAchat demandeAchat = demandeAchatData.get();
+                
+                // Update status to SOUMIS
+                Optional<Status> statusSoumis = statusRepository.findByCode("SOUMIS");
+                if (statusSoumis.isPresent()) {
+                    demandeAchat.setStatus(statusSoumis.get());
+                } else {
+                    // If SOUMIS doesn't exist, create it or use default
+                    Status status = new Status();
+                    status.setId(2L); // Assuming 2 is SOUMIS
+                    status.setCode("SOUMIS");
+                    status.setLibelle("Soumis");
+                    demandeAchat.setStatus(status);
+                }
+                
+                return ResponseEntity.ok(demandeAchatService.save(demandeAchat));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PutMapping("/demandes/{id}/rejeter")
+    public ResponseEntity<DemandeAchat> rejeterDemandeAchat(@PathVariable("id") Long id, @RequestParam String motif) {
+        try {
+            Optional<DemandeAchat> demandeAchatData = demandeAchatService.findById(id);
+            
+            if (demandeAchatData.isPresent()) {
+                DemandeAchat demandeAchat = demandeAchatData.get();
+                
+                // Update status to REJETE (assuming status with code REJETE exists)
+                Optional<Status> statusRejete = statusRepository.findByCode("REJETE");
+                if (statusRejete.isPresent()) {
+                    demandeAchat.setStatus(statusRejete.get());
+                } else {
+                    // If REJETE doesn't exist, use BROUILLON
+                    Optional<Status> statusBrouillon = statusRepository.findByCode("BROUILLON");
+                    demandeAchat.setStatus(statusBrouillon.orElse(null));
+                }
+                
+                // You can store the motif in a separate field if needed
+                // demandeAchat.setMotifRejet(motif);
                 
                 return ResponseEntity.ok(demandeAchatService.save(demandeAchat));
             } else {

@@ -40,7 +40,8 @@ export const achatApi = {
   getDemandeAchat: (id) => api.get(`/achats/demandes/${id}`),
   creerDemandeAchat: (data) => api.post('/achats/demandes', data),
   validerDemandeAchat: (id) => api.put(`/achats/demandes/${id}/valider`),
-  soumettreDemandeAchat: (id) => api.post(`/achats/demandes/${id}/soumettre`),
+  rejeterDemandeAchat: (id, motif) => api.put(`/achats/demandes/${id}/rejeter?motif=${encodeURIComponent(motif)}`),
+  soumettreDemandeAchat: (id) => api.put(`/achats/demandes/${id}/soumettre`),
   approuverDemandeAchat: (id, personnelId) => api.post(`/achats/demandes/${id}/approuver?personnelId=${personnelId}`),
   
   // Proformas
@@ -111,6 +112,7 @@ export const stockApi = {
   
   // État du stock
   getAllStocks: () => api.get('/stock/tous'),
+  getStockValorise: () => api.get('/stock/valorisation'),
   getStocksByDepot: (depotId) => api.get(`/stock/niveau?depotId=${depotId}`),
   getStocksByArticle: (articleId) => api.get(`/stock/niveau/article/${articleId}`),
   getStock: (articleId, depotId) => api.get(`/stock/niveau/article/${articleId}/depot/${depotId}`),
@@ -128,13 +130,14 @@ export const stockApi = {
   
   // Mouvements
   getMouvements: (articleId, depotId) => {
-    let url = '/stock/mouvements'
+    let url = '/mouvements'
     const params = []
     if (articleId) params.push(`articleId=${articleId}`)
     if (depotId) params.push(`depotId=${depotId}`)
     if (params.length > 0) url += '?' + params.join('&')
     return api.get(url)
   },
+  createMouvement: (data) => api.post('/mouvements', data),
   
   // Entrées/Sorties
   entreeStock: (articleId, depotId, quantite, prixUnitaire, personnelId, reference, numeroLot) => {

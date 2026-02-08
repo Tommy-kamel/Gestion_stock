@@ -68,12 +68,6 @@
                 <router-link to="/achats/bons-commande" class="nav-sublink" active-class="active">
                   Bons de commande
                 </router-link>
-                <router-link to="/achats/bons-livraison" class="nav-sublink" active-class="active">
-                  Bons de livraison
-                </router-link>
-                <router-link to="/achats/factures" class="nav-sublink" active-class="active">
-                  Factures fournisseurs
-                </router-link>
               </div>
             </div>
 
@@ -129,21 +123,21 @@
                 </svg>
               </button>
               <div v-show="openMenus.stock" class="pl-4 space-y-1 mt-1">
-                <router-link to="/stock/etat" class="nav-sublink" active-class="active">
-                  État des stocks
-                </router-link>
-                <router-link to="/stock/articles" class="nav-sublink" active-class="active">
-                  Articles
-                </router-link>
-                <router-link to="/stock/lots" class="nav-sublink" active-class="active">
-                  Lots
+                <router-link to="/stock/valorisation" class="nav-sublink" active-class="active">
+                  Valorisation des stocks
                 </router-link>
                 <router-link to="/stock/mouvements" class="nav-sublink" active-class="active">
                   Mouvements
                 </router-link>
-                <router-link to="/stock/depots" class="nav-sublink" active-class="active">
+                <!-- <router-link to="/stock/articles" class="nav-sublink" active-class="active">
+                  Articles
+                </router-link> -->
+                <!-- <router-link to="/stock/lots" class="nav-sublink" active-class="active">
+                  Lots
+                </router-link> -->
+                <!-- <router-link to="/stock/depots" class="nav-sublink" active-class="active">
                   Dépôts
-                </router-link>
+                </router-link> -->
               </div>
             </div>
           </nav>
