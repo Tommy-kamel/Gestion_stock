@@ -24,19 +24,19 @@ public class ProformaFournisseur {
     @Column(name = "date_validite")
     private LocalDate dateValidite;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_fournisseur", nullable = false)
     private Fournisseur fournisseur;
 
     @Column(name = "montant_ttc", precision = 15, scale = 2, columnDefinition = "NUMERIC(15,2) DEFAULT 0")
     private BigDecimal montantTtc = BigDecimal.ZERO;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_demande_achat")
     @JsonIgnoreProperties("details")
     private DemandeAchat demandeAchat;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_status", nullable = false)
     private Status status;
 

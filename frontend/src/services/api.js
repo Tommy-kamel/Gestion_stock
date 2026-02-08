@@ -54,9 +54,10 @@ export const achatApi = {
   rejeterFinance: (demandeId, personnelId, motif) => api.post(`/achats/demandes/${demandeId}/rejeter-finance?personnelId=${personnelId}&motif=${motif}`),
   
   // Bons de commande
-  getBonsCommande: () => api.get('/achats/bons-commande'),
-  creerBonCommande: (demandeId, personnelId) => api.post(`/achats/demandes/${demandeId}/bon-commande?personnelId=${personnelId}`),
-  signerBonCommande: (bcId, personnelId) => api.post(`/achats/bons-commande/${bcId}/signer?personnelId=${personnelId}`),
+  getBonsCommande: () => api.get('/bons-commande-achat'),
+  getBonCommande: (id) => api.get(`/bons-commande-achat/${id}`),
+  creerBonCommande: (data) => api.post('/bons-commande-achat', data),
+  livrerEtPayerBonCommande: (id, data) => api.post(`/bons-commande-achat/${id}/livrer-et-payer`, data),
   
   // Bons de livraison
   getBonsLivraison: () => api.get('/achats/bons-livraison'),

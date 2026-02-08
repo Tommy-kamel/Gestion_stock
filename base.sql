@@ -245,6 +245,9 @@ CREATE TABLE facture_achat (
     FOREIGN KEY (id_client) REFERENCES client(id)
 );
 
+ALTER TABLE facture_achat DROP COLUMN id_client;
+ALTER TABLE facture_achat DROP COLUMN reste_a_payer;
+
 CREATE TABLE facture_achat_details (
     id              SERIAL PRIMARY KEY,
     id_facture_achat INTEGER NOT NULL,

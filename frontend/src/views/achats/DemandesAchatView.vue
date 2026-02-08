@@ -77,11 +77,11 @@
                 {{ formatDate(da.dateDemande) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                {{ da.depotCible?.nom }}
+                {{ da.depot?.nom }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="getStatutClass(da.statut?.code)" class="px-2 py-1 text-xs font-medium rounded-full">
-                  {{ da.statut?.libelle }}
+                <span :class="getStatutClass(da.status?.code)" class="px-2 py-1 text-xs font-medium rounded-full">
+                  {{ da.status?.libelle }}
                 </span>
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm">

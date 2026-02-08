@@ -20,15 +20,15 @@ public class DemandeAchat {
     @Column(name = "date_demande")
     private LocalDate dateDemande;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_entreprise", nullable = false)
     private Entreprise entreprise;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_site", nullable = false)
     private Site site;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_depot")
     private Depot depot;
 
@@ -38,7 +38,7 @@ public class DemandeAchat {
     @Column(name = "motif_achat", columnDefinition = "TEXT")
     private String motifAchat;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_status", nullable = false)
     private Status status;
 
