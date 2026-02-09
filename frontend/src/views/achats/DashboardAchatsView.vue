@@ -58,7 +58,7 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <!-- <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 mb-1">Montant Total</p>
@@ -70,7 +70,7 @@
                 </svg>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- Graphiques et tableaux -->
