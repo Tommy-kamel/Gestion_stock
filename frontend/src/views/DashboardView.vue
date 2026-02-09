@@ -45,33 +45,33 @@
         </div>
       </div>
 
-      <!-- Alertes stock -->
+      <!-- Total Articles -->
       <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-500">Alertes stock</p>
+            <p class="text-sm font-medium text-gray-500">Total Articles</p>
             <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.alertesStock || 0 }}</p>
-            <p class="text-sm text-orange-600 mt-1">Articles sous minimum</p>
+            <p class="text-sm text-orange-600 mt-1">Articles en catalogue</p>
           </div>
           <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
             <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
         </div>
       </div>
 
-      <!-- Solde caisses -->
+      <!-- Total Mouvements -->
       <div class="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
         <div class="flex items-center justify-between">
           <div>
-            <p class="text-sm font-medium text-gray-500">Solde caisses</p>
-            <p class="text-3xl font-bold text-gray-900 mt-2">{{ formatMontant(stats.soldeCaisses) }}</p>
-            <p class="text-sm text-purple-600 mt-1">MGA</p>
+            <p class="text-sm font-medium text-gray-500">Total Mouvements</p>
+            <p class="text-3xl font-bold text-gray-900 mt-2">{{ stats.soldeCaisses || 0 }}</p>
+            <p class="text-sm text-purple-600 mt-1">Entrées/Sorties stock</p>
           </div>
           <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
             <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
             </svg>
           </div>
         </div>
@@ -113,9 +113,9 @@
         <div class="p-6 border-b border-gray-100">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-semibold text-gray-900">Devis vente récents</h2>
-            <router-link to="/ventes/devis" class="text-sm text-indigo-600 hover:text-indigo-700">
+            <!-- <router-link to="/ventes/devis" class="text-sm text-indigo-600 hover:text-indigo-700">
               Voir tout →
-            </router-link>
+            </router-link> -->
           </div>
         </div>
         <div class="divide-y divide-gray-100">
@@ -139,20 +139,20 @@
 
     <!-- Résumé finances -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-sm p-6 text-white">
-        <p class="text-green-100 text-sm font-medium">Créances clients</p>
-        <p class="text-3xl font-bold mt-2">{{ formatMontant(stats.creancesClients) }}</p>
-        <p class="text-green-100 text-sm mt-1">MGA à recevoir</p>
-      </div>
-      <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-sm p-6 text-white">
-        <p class="text-red-100 text-sm font-medium">Dettes fournisseurs</p>
-        <p class="text-3xl font-bold mt-2">{{ formatMontant(stats.dettesFournisseurs) }}</p>
-        <p class="text-red-100 text-sm mt-1">MGA à payer</p>
-      </div>
       <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-sm p-6 text-white">
         <p class="text-indigo-100 text-sm font-medium">Valeur stock</p>
         <p class="text-3xl font-bold mt-2">{{ formatMontant(stats.valeurStock) }}</p>
         <p class="text-indigo-100 text-sm mt-1">MGA en stock</p>
+      </div>
+      <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-sm p-6 text-white">
+        <p class="text-green-100 text-sm font-medium">Commandes clients</p>
+        <p class="text-3xl font-bold mt-2">{{ stats.creancesClients }}</p>
+        <p class="text-green-100 text-sm mt-1">Bons de commande vente</p>
+      </div>
+      <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-sm p-6 text-white">
+        <p class="text-red-100 text-sm font-medium">Commandes fournisseurs</p>
+        <p class="text-3xl font-bold mt-2">{{ stats.dettesFournisseurs }}</p>
+        <p class="text-red-100 text-sm mt-1">Bons de commande achat</p>
       </div>
     </div>
   </div>
@@ -160,7 +160,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { dashboardApi } from '@/services/api'
+import axios from 'axios'
 
 const stats = ref({
   demandesAchat: 0,
@@ -208,36 +208,72 @@ const getStatutClass = (code) => {
 
 const loadDashboard = async () => {
   try {
-    const response = await dashboardApi.getDashboard()
-    const data = response.data
+    const token = localStorage.getItem('token')
+    const headers = { Authorization: `Bearer ${token}` }
+    
+    // Charger les données des 3 dashboards
+    const [achatsRes, ventesRes, stockRes, caissesRes] = await Promise.all([
+      axios.get('http://localhost:8080/api/dashboard/achats', { headers }),
+      axios.get('http://localhost:8080/api/dashboard/ventes', { headers }),
+      axios.get('http://localhost:8080/api/dashboard/stock', { headers }),
+      axios.get('http://localhost:8080/api/finances/caisses', { headers }).catch(() => ({ data: [] }))
+    ])
+    
+    const achats = achatsRes.data
+    const ventes = ventesRes.data
+    const stock = stockRes.data
+    const caisses = caissesRes.data
     
     stats.value = {
-      demandesAchat: data.totalDemandesAchat || 0,
-      daEnAttente: data.demandesEnAttente || 0,
-      devisVente: data.totalDevisVente || 0,
-      devisEnAttente: data.devisEnAttente || 0,
-      alertesStock: data.alertesStock || 0,
-      soldeCaisses: data.soldeCaisses || 0,
-      creancesClients: data.creancesClients || 0,
-      dettesFournisseurs: data.dettesFournisseurs || 0,
-      valeurStock: data.valeurStock || 0
+      demandesAchat: achats.totalDemandesAchat || 0,
+      daEnAttente: Object.entries(achats.demandesParStatut || {})
+        .filter(([statut]) => statut.includes('ATTENTE') || statut.includes('SOUMIS'))
+        .reduce((sum, [, count]) => sum + count, 0),
+      devisVente: ventes.totalProformas || 0,
+      devisEnAttente: Object.entries(ventes.proformasParStatut || {})
+        .filter(([statut]) => statut.includes('ATTENTE') || statut.includes('SOUMIS'))
+        .reduce((sum, [, count]) => sum + count, 0),
+      alertesStock: stock.totalArticles || 0, // Total articles
+      soldeCaisses: stock.totalMouvements || 0, // Total mouvements stock
+      creancesClients: ventes.totalBonCommande || 0, // Nombre de commandes clients
+      dettesFournisseurs: achats.totalBonCommande || 0, // Nombre de commandes fournisseurs
+      valeurStock: stock.valeurTotaleStock || 0
     }
     
-    recentDA.value = data.dernieresDemandesAchat || []
-    recentDevis.value = data.derniersDevis || []
+    // Dernières demandes d'achat
+    recentDA.value = (achats.dernieresDemandesAchat || []).slice(0, 5).map(da => ({
+      id: da.id,
+      numeroDa: `DA-${da.id}`,
+      dateDemande: new Date(da.dateDemande).toLocaleDateString('fr-FR'),
+      statut: {
+        code: da.status?.code || 'BROUILLON',
+        libelle: da.status?.libelle || 'Brouillon'
+      }
+    }))
+    
+    // Derniers devis (proformas vente)
+    recentDevis.value = (ventes.dernieresDemandesClient || []).slice(0, 5).map(dc => ({
+      id: dc.id,
+      numeroDevis: `PV-${dc.id}`,
+      client: dc.client?.nom || 'N/A',
+      montantTtc: 0, // À calculer si disponible
+      statut: {
+        code: dc.statutValidation || 'EN_ATTENTE',
+        libelle: dc.statutValidation || 'En attente'
+      }
+    }))
   } catch (error) {
     console.error('Erreur chargement dashboard:', error)
-    // Données de démonstration
     stats.value = {
-      demandesAchat: 12,
-      daEnAttente: 3,
-      devisVente: 8,
-      devisEnAttente: 2,
-      alertesStock: 5,
-      soldeCaisses: 12000000,
-      creancesClients: 4500000,
-      dettesFournisseurs: 2800000,
-      valeurStock: 25000000
+      demandesAchat: 0,
+      daEnAttente: 0,
+      devisVente: 0,
+      devisEnAttente: 0,
+      alertesStock: 0,
+      soldeCaisses: 0,
+      creancesClients: 0,
+      dettesFournisseurs: 0,
+      valeurStock: 0
     }
   }
 }
