@@ -68,9 +68,9 @@ INSERT INTO site (nom, adresse, telephone, email, id_entreprise) VALUES
 -- 8. DEPOTS (À INSeRER)
 -- ------------------------------------------------------------------------------
 INSERT INTO depot (nom, adresse, id_site, id_methode_valorisation_stock) VALUES
-('Depot Antananarivo', 'Lot II C 123, Antananarivo', 1, 1),
-('Depot Toamasina', 'Rte Nationale 5, Toamasina', 2, 2),
-('Depot Antsirabe', 'Avenue de l''Industrie, Antsirabe', 1, 3);
+('Depot Antananarivo (FIFO)', 'Lot II C 123, Antananarivo', 1, 1),
+('Depot Toamasina (LIFO)', 'Rte Nationale 5, Toamasina', 2, 2),
+('Depot Antsirabe (CMUP)', 'Avenue de l''Industrie, Antsirabe', 1, 3);
 
 -- ------------------------------------------------------------------------------
 -- 9. FOURNISSEURS (À INSeRER)
