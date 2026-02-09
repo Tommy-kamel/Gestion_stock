@@ -164,7 +164,7 @@ const fetchStats = async () => {
 }
 
 const formatMoney = (value) => {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value || 0)
+  return new Intl.NumberFormat('fr-MG', { style: 'currency', currency: 'MGA' }).format(value || 0)
 }
 
 const formatDate = (date) => {
