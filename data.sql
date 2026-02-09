@@ -34,7 +34,8 @@ INSERT INTO article_categorie (code, libelle) VALUES
 ('PRODUIT_FINI', 'Produits finis'),
 ('CONSOMMABLE', 'Consommables'),
 ('EQUIPEMENT', 'equipements'),
-('SERVICE', 'Services');
+('SERVICE', 'Services'),
+('ELECTRONIQUE', 'Articles électroniques');
 
 -- ------------------------------------------------------------------------------
 -- 4. MeTHODES DE VALORISATION STOCK (À INSeRER)
@@ -91,16 +92,16 @@ INSERT INTO client (nom, adresse) VALUES
 ('SARL HERY Import Export', 'Rue Rainilaiarivony, Fianarantsoa');
 
 -- ------------------------------------------------------------------------------
--- 11. ARTICLES (À INSeRER)
+-- 11. ARTICLES (À INSeRER) - Articles électroniques (données réalistes)
 -- ------------------------------------------------------------------------------
 INSERT INTO article (reference, designation, prix_achat_ref, prix_vente_ref, id_unite, article_categorie_id) VALUES
-('ART001', 'Riz blanc 50kg', 70000.00, 95000.00, 1, 1),
-('ART002', 'Huile vegetale 20L', 120000.00, 150000.00, 2, 1),
-('ART003', 'Tuyau PVC 50mm', 8500.00, 12000.00, 3, 1),
-('ART004', 'Peinture acrylique blanche 5L', 25000.00, 38000.00, 2, 1),
-('ART005', 'Moteur industriel 3kW', 1200000.00, 1800000.00, 6, 2),
-('ART006', 'Gants de protection (paire)', 2500.00, 4000.00, 6, 3),
-('ART007', 'Tour CNC - modele basique', 25000000.00, 35000000.00, 6, 4);
+('ART001', 'Samsung Galaxy A14 (128GB)', 420000.00, 560000.00, 6, 6),
+('ART002', 'Dell Inspiron 14 5430 - Core i5, 8GB, 512GB SSD', 2800000.00, 3600000.00, 6, 6),
+('ART003', 'TP-Link Archer AX20 (WiFi 6) - Routeur', 160000.00, 240000.00, 6, 6),
+('ART004', 'Samsung Smart TV 43" Crystal UHD (AU7000)', 1400000.00, 1900000.00, 6, 6),
+('ART005', 'HPE ProLiant MicroServer Gen10 Plus', 6500000.00, 9500000.00, 6, 6),
+('ART006', 'Sony WH-CH720N - Casque Bluetooth', 60000.00, 95000.00, 6, 6),
+('ART007', 'Anker PowerCore 20100mAh - Power Bank', 80000.00, 120000.00, 6, 6);
 
 -- ------------------------------------------------------------------------------
 -- 12. STOCK INITIAL (À INSeRER)
