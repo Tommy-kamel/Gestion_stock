@@ -205,8 +205,10 @@ class GeminiService {
       
       if (error.response?.status === 429) {
         throw new Error('⏳ Limite de taux dépassée. Veuillez attendre au moins 1 minute entre chaque question. Gemini impose des limites strictes.')
+      } else if (error.response?.status === 403) {
+        throw new Error('🔑 Clé API Gemini invalide ou expirée. Vérifiez votre clé dans le fichier .env (VITE_GEMINI_API_KEY). Consultez https://makersuite.google.com/app/apikey pour générer une nouvelle clé.')
       } else if (error.response?.status === 400) {
-        throw new Error('Clé API invalide. Vérifiez votre configuration dans le fichier .env')
+        throw new Error('Requête invalide. Vérifiez la configuration de l\'API Gemini.')
       } else if (error.code === 'ECONNABORTED') {
         throw new Error('Délai d\'attente dépassé. Le serveur met trop de temps à répondre.')
       }

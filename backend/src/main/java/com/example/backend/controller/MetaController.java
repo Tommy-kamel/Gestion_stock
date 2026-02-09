@@ -27,12 +27,15 @@ public class MetaController {
         ventes.add(Map.of("method", "GET", "path", "/api/ventes/proformas", "description", "Liste tous les proformas vente (devis clients)"));
         ventes.add(Map.of("method", "GET", "path", "/api/ventes/proformas/valides", "description", "Proformas vente validés"));
         ventes.add(Map.of("method", "GET", "path", "/api/ventes/bons-commande", "description", "Liste tous les bons de commande vente"));
+        ventes.add(Map.of("method", "GET", "path", "/api/ventes/demandes-client/validees", "description", "Demandes clients validées"));
         
         // STOCK
         List<Map<String, String>> stock = new ArrayList<>();
-        stock.add(Map.of("method", "GET", "path", "/api/stock/valorisation", "description", "État du stock valorisé avec mouvements et valeurs"));
-        stock.add(Map.of("method", "GET", "path", "/api/stock/articles", "description", "Liste tous les articles du catalogue"));
-        stock.add(Map.of("method", "GET", "path", "/api/stock/depots", "description", "Liste tous les dépôts d'entreposage"));
+        stock.add(Map.of("method", "GET", "path", "/api/stock/valorisation", "description", "Valeur totale du stock avec détails par article"));
+        stock.add(Map.of("method", "GET", "path", "/api/stock/articles", "description", "Liste complète des articles du catalogue"));
+        stock.add(Map.of("method", "GET", "path", "/api/stock/depots", "description", "Liste tous les dépôts de stockage"));
+        stock.add(Map.of("method", "GET", "path", "/api/stock/mouvements", "description", "Liste TOUS les mouvements de stock (entrées/sorties) - utiliser pour compter"));
+        stock.add(Map.of("method", "GET", "path", "/api/stock/lots", "description", "Liste tous les lots de stock avec traçabilité"));
         
         // RÉFÉRENTIEL
         List<Map<String, String>> referentiel = new ArrayList<>();
@@ -49,7 +52,9 @@ public class MetaController {
         
         // DASHBOARD
         List<Map<String, String>> dashboard = new ArrayList<>();
-        dashboard.add(Map.of("method", "GET", "path", "/api/dashboard/synthese", "description", "Vue synthétique globale (KPIs, stats)"));
+        dashboard.add(Map.of("method", "GET", "path", "/api/dashboard/achats", "description", "Stats Achats: total demandes, proformas, BC, montant, top fournisseurs"));
+        dashboard.add(Map.of("method", "GET", "path", "/api/dashboard/ventes", "description", "Stats Ventes: total demandes clients, proformas, BC, CA, top clients"));
+        dashboard.add(Map.of("method", "GET", "path", "/api/dashboard/stock", "description", "Stats Stock: total articles/dépôts/mouvements, valeur, ruptures, top articles"));
         
         response.put("achats", achats);
         response.put("ventes", ventes);
