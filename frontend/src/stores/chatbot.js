@@ -97,11 +97,31 @@ export const useChatbotStore = defineStore('chatbot', () => {
     return results
   }
 
-  // Envoyer un message avec intelligence dynamique
+  // Envoyer un message avec intelligence dynamique (OPTIMISÉ - 1 seul appel)
   const sendMessage = async (messageText) => {
     if (!messageText.trim()) return
 
     error.value = null
+
+    // Vérifier le temps écoulé depuis la dernière requête
+    const lastRequest = localStorage.getItem('gemini_last_request')
+    if (lastRequest) {
+      const timeSinceLastRequest = Date.now() - parseInt(lastRequest)
+      const minWaitTime = 60000 // 60 secondes
+      if (timeSinceLastRequest < minWaitTime) {
+        const remainingSeconds = Math.ceil((minWaitTime - timeSinceLastRequest) / 1000)
+        const warningMsg = `⏳ Veuillez patienter encore ${remainingSeconds} secondes avant la prochaine question (limite de l'API Gemini)`
+        
+        messages.value.push({
+          id: Date.now(),
+          text: warningMsg,
+          sender: 'bot',
+          timestamp: new Date(),
+          isError: true
+        })
+        return
+      }
+    }
 
     // Ajouter le message utilisateur
     const userMessage = {
@@ -133,75 +153,74 @@ export const useChatbotStore = defineStore('chatbot', () => {
             .join('\n')
         : 'Endpoints non disponibles'
 
-      // ÉTAPE 1: Demander à Gemini quels endpoints appeler
-      const analysisPrompt = `Question utilisateur: "${messageText}"
+      console.log('🔍 Analyse et réponse en un seul appel...')
+      
+      // APPROCHE OPTIMISÉE: Un seul appel à Gemini qui fait tout
+      const smartPrompt = `Tu es l'assistant ERP. L'utilisateur demande: "${messageText}"
 
-Voici les endpoints API disponibles dans le système:
+ÉTAPE 1 - ANALYSE:
+Voici les endpoints API disponibles:
 ${endpointsContext}
 
-Analyse cette question et réponds UNIQUEMENT avec un JSON valide (pas de markdown, pas de texte avant/après):
-- Si la question porte sur des DONNÉES réelles du système → {"needsData": true, "endpoints": ["liste des endpoints"], "explanation": "pourquoi"}
-- Si la question porte sur le PROCESSUS/AIDE → {"needsData": false, "response": "ta réponse complète ici"}
+Détermine si cette question nécessite des DONNÉES du système ou si c'est une question sur le PROCESSUS/AIDE.
 
-IMPORTANT: Utilise UNIQUEMENT les endpoints listés ci-dessus. Choisis ceux qui sont pertinents pour répondre à la question.
+ÉTAPE 2 - ACTION:
+- Si DONNÉES nécessaires: Réponds avec un JSON: {"action": "fetch", "endpoints": ["liste"], "reason": "pourquoi"}
+- Si PROCESSUS/AIDE: Réponds DIRECTEMENT à la question de manière complète et structurée
 
-Exemple 1: "Il y a combien de proformas fournisseur ?"
-{"needsData": true, "endpoints": ["/api/achats/proformas"], "explanation": "Pour compter les proformas fournisseurs"}
+IMPORTANT: 
+- Pour des questions comme "combien de...", "liste des...", "état de..." → utilise "fetch"
+- Pour des questions comme "comment faire...", "c'est quoi...", "explique..." → réponds directement
+- Utilise UNIQUEMENT les endpoints listés ci-dessus
+- Pas de \`\`\`json, juste le JSON pur si fetch
 
-Exemple 2: "Comment créer une DA ?"
-{"needsData": false, "response": "Pour créer une Demande d'Achat : 1. Menu Achats > Demandes d'Achat..."}
+Exemples:
+Q: "Il y a combien de proformas?" → {"action": "fetch", "endpoints": ["/api/achats/proformas"], "reason": "Compter les proformas"}
+Q: "Comment créer une DA?" → [Réponse directe complète sur le processus]
 
-Réponds UNIQUEMENT avec le JSON, sans \`\`\`json ni aucun autre texte:`
+Réponds maintenant:`
 
-      const analysisResponse = await geminiApi.sendMessage(analysisPrompt)
+      const initialResponse = await geminiApi.sendMessage(smartPrompt)
       
-      // Nettoyer la réponse (enlever les markdown si présents)
-      let cleanedResponse = analysisResponse.trim()
+      // Nettoyer la réponse
+      let cleanedResponse = initialResponse.trim()
       cleanedResponse = cleanedResponse.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim()
       
       console.log('Réponse IA:', cleanedResponse)
       
-      let analysis
-      try {
-        analysis = JSON.parse(cleanedResponse)
-      } catch (parseError) {
-        console.error('Erreur parsing JSON:', parseError, cleanedResponse)
-        throw new Error('Erreur d\'analyse de la question. Reformulez svp.')
-      }
-
       let finalResponse = ''
 
-      if (analysis.needsData && analysis.endpoints && analysis.endpoints.length > 0) {
-        // ÉTAPE 2: Récupérer les données des endpoints
-        const endpointsData = await fetchEndpointsData(analysis.endpoints)
+      // Vérifier si c'est une demande de fetch ou une réponse directe
+      try {
+        const parsed = JSON.parse(cleanedResponse)
         
-        // ÉTAPE 3: Reformuler avec Gemini en incluant les données réelles
-        const dataContext = Object.entries(endpointsData)
-          .map(([endpoint, result]) => {
+        if (parsed.action === 'fetch' && parsed.endpoints && parsed.endpoints.length > 0) {
+          // Récupérer les données
+          console.log('📡 Récupération des données:', parsed.endpoints)
+          const endpointsData = await fetchEndpointsData(parsed.endpoints)
+          
+          // Formatter les données pour affichage
+          const dataLines = []
+          for (const [endpoint, result] of Object.entries(endpointsData)) {
             if (result.success) {
-              return `\n[DONNÉES DE ${endpoint}]:\n${JSON.stringify(result.data, null, 2)}`
+              if (Array.isArray(result.data)) {
+                dataLines.push(`📊 ${endpoint}: ${result.data.length} élément(s)`)
+              } else {
+                dataLines.push(`📊 ${endpoint}: Données récupérées`)
+              }
             } else {
-              return `\n[ERREUR ${endpoint}]: ${result.error}`
+              dataLines.push(`❌ ${endpoint}: Erreur - ${result.error}`)
             }
-          })
-          .join('\n')
-
-        const finalPrompt = `Question utilisateur: "${messageText}"
-
-${dataContext}
-
-Maintenant, réponds à la question de l'utilisateur en utilisant ces données RÉELLES du système.
-Donne une réponse précise, claire et structurée en français.
-Utilise des émojis si approprié.
-Formate bien la réponse avec des listes ou tableaux si nécessaire.`
-
-        finalResponse = await geminiApi.sendMessage(finalPrompt)
-        
-      } else if (!analysis.needsData && analysis.response) {
-        // Réponse directe sans besoin de données
-        finalResponse = analysis.response
-      } else {
-        throw new Error('Format de réponse invalide de l\'IA')
+          }
+          
+          finalResponse = `${parsed.reason}\n\n${dataLines.join('\n')}`
+        } else {
+          // Réponse directe impossible à parser comme JSON = réponse textuelle
+          throw new Error('Not JSON')
+        }
+      } catch {
+        // C'est une réponse textuelle directe (pas du JSON)
+        finalResponse = cleanedResponse
       }
 
       // Ajouter la réponse du bot

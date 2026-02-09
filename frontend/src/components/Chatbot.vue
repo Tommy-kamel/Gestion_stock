@@ -143,6 +143,12 @@
         <p class="text-xs text-gray-400 mt-2 text-center">
           Appuyez sur Entrée pour envoyer • Shift+Entrée pour nouvelle ligne
         </p>
+        <!-- Avertissement rate limiting -->
+        <div class="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-2">
+          <p class="text-xs text-amber-800 text-center">
+            ⏳ <strong>Délai minimum : 60 secondes</strong> entre chaque question (limite API Gemini)
+          </p>
+        </div>
       </div>
     </div>
   </Transition>

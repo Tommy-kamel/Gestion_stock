@@ -72,10 +72,70 @@ class GeminiService {
   constructor() {
     this.apiKey = GEMINI_API_KEY
     this.conversationHistory = []
+    // Récupérer le dernier temps d'appel depuis localStorage
+    const lastRequest = localStorage.getItem('gemini_last_request')
+    this.lastRequestTime = lastRequest ? parseInt(lastRequest) : 0
+    this.minRequestInterval = 60000 // 60 secondes (1 minute) minimum entre les requêtes
+    this.requestQueue = Promise.resolve()
   }
 
   /**
-   * Envoie un message au chatbot Gemini
+   * Attendre le délai minimum entre requêtes (rate limiting)
+   */
+  async waitForRateLimit() {
+    const now = Date.now()
+    const timeSinceLastRequest = now - this.lastRequestTime
+    const waitTime = Math.max(0, this.minRequestInterval - timeSinceLastRequest)
+    
+    if (waitTime > 0) {
+      const seconds = Math.ceil(waitTime / 1000)
+      console.log(`⏳ Rate limiting: attente de ${seconds} secondes...`)
+      await new Promise(resolve => setTimeout(resolve, waitTime))
+    }
+    
+    this.lastRequestTime = Date.now()
+    // Sauvegarder dans localStorage pour persister entre les sessions
+    localStorage.setItem('gemini_last_request', this.lastRequestTime.toString())
+  }
+
+  /**
+   * Retry avec backoff exponentiel
+   */
+  async sendWithRetry(payload, maxRetries = 2) {
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+      try {
+        await this.waitForRateLimit()
+        
+        const response = await axios.post(
+          `${GEMINI_API_URL}?key=${this.apiKey}`,
+          payload,
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            timeout: 30000 // 30 secondes timeout
+          }
+        )
+        
+        return response
+      } catch (error) {
+        if (error.response?.status === 429) {
+          const backoffTime = Math.pow(2, attempt) * 30000 // 30s, 60s
+          const seconds = Math.ceil(backoffTime / 1000)
+          console.warn(`⚠️ 429 Rate Limit - Retry ${attempt + 1}/${maxRetries} dans ${seconds} secondes`)
+          
+          if (attempt < maxRetries - 1) {
+            await new Promise(resolve => setTimeout(resolve, backoffTime))
+            continue
+          }
+        }
+        throw error
+      }
+    }
+  }
+
+  /**
+   * Envoie un message au chatbot Gemini avec queue et rate limiting
    * @param {string} userMessage - Message de l'utilisateur
    * @returns {Promise<string>} - Réponse du chatbot
    */
@@ -128,15 +188,7 @@ class GeminiService {
         ]
       }
 
-      const response = await axios.post(
-        `${GEMINI_API_URL}?key=${this.apiKey}`,
-        payload,
-        {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
-      )
+      const response = await this.sendWithRetry(payload)
 
       // Extraire la réponse
       const botResponse = response.data.candidates[0].content.parts[0].text
@@ -152,9 +204,11 @@ class GeminiService {
       console.error('Erreur Gemini API:', error.response?.data || error.message)
       
       if (error.response?.status === 429) {
-        throw new Error('Limite de requêtes atteinte. Veuillez patienter quelques secondes.')
+        throw new Error('⏳ Limite de taux dépassée. Veuillez attendre au moins 1 minute entre chaque question. Gemini impose des limites strictes.')
       } else if (error.response?.status === 400) {
         throw new Error('Clé API invalide. Vérifiez votre configuration dans le fichier .env')
+      } else if (error.code === 'ECONNABORTED') {
+        throw new Error('Délai d\'attente dépassé. Le serveur met trop de temps à répondre.')
       }
       
       throw new Error('Erreur de communication avec le chatbot. Réessayez dans quelques instants.')
