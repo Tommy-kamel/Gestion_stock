@@ -11,6 +11,7 @@ const ProformasAchatView = () => import('@/views/achats/ProformasAchatView.vue')
 const BonsCommandeAchatView = () => import('@/views/achats/BonsCommandeAchatView.vue')
 const BonsLivraisonAchatView = () => import('@/views/achats/BonsLivraisonAchatView.vue')
 const FacturesAchatView = () => import('@/views/achats/FacturesAchatView.vue')
+const DashboardAchatsView = () => import('@/views/achats/DashboardAchatsView.vue')
 
 // Ventes
 const DemandesAchatClientView = () => import('@/views/ventes/DemandesAchatClientView.vue')
@@ -19,6 +20,7 @@ const DevisVenteView = () => import('@/views/ventes/DevisVenteView.vue')
 const BonsCommandeVenteView = () => import('@/views/ventes/BonsCommandeVenteView.vue')
 const BonsLivraisonVenteView = () => import('@/views/ventes/BonsLivraisonVenteView.vue')
 const FacturesVenteView = () => import('@/views/ventes/FacturesVenteView.vue')
+const DashboardVentesView = () => import('@/views/ventes/DashboardVentesView.vue')
 
 // Stock
 const ValorisationStockView = () => import('@/views/stock/ValorisationStockView.vue')
@@ -26,6 +28,7 @@ const ArticlesView = () => import('@/views/stock/ArticlesView.vue')
 const LotsView = () => import('@/views/stock/LotsView.vue')
 const MouvementsView = () => import('@/views/stock/MouvementsView.vue')
 const DepotsView = () => import('@/views/stock/DepotsView.vue')
+const DashboardStockView = () => import('@/views/stock/DashboardStockView.vue')
 
 const routes = [
   {
@@ -42,6 +45,12 @@ const routes = [
   },
   
   // ===================== ACHATS =====================
+  {
+    path: '/achats/dashboard',
+    name: 'dashboard-achats',
+    component: DashboardAchatsView,
+    meta: { requiresAuth: true, title: 'Dashboard Achats' }
+  },
   {
     path: '/achats/demandes',
     name: 'demandes-achat',
@@ -74,6 +83,12 @@ const routes = [
   },
   
   // ===================== VENTES =====================
+  {
+    path: '/ventes/dashboard',
+    name: 'dashboard-ventes',
+    component: DashboardVentesView,
+    meta: { requiresAuth: true, title: 'Dashboard Ventes' }
+  },
   {
     path: '/ventes/demandes-client',
     name: 'demandes-achat-client',
@@ -112,6 +127,12 @@ const routes = [
   },
   
   // ===================== STOCK =====================
+  {
+    path: '/stock/dashboard',
+    name: 'dashboard-stock',
+    component: DashboardStockView,
+    meta: { requiresAuth: true, title: 'Dashboard Stock' }
+  },
   {
     path: '/stock/valorisation',
     name: 'valorisation-stock',

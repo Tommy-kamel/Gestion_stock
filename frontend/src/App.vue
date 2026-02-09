@@ -33,7 +33,7 @@
           </div>
 
           <!-- Navigation -->
-          <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+          <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto max-h-[calc(100vh-8rem)]">
             <!-- Dashboard -->
             <router-link to="/" class="nav-link" active-class="active" exact>
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -59,6 +59,9 @@
                 </svg>
               </button>
               <div v-show="openMenus.achats" class="pl-4 space-y-1 mt-1">
+                <router-link to="/achats/dashboard" class="nav-sublink" active-class="active">
+                  Dashboard
+                </router-link>
                 <router-link to="/achats/demandes" class="nav-sublink" active-class="active">
                   Demandes d'achat
                 </router-link>
@@ -88,6 +91,9 @@
                 </svg>
               </button>
               <div v-show="openMenus.ventes" class="pl-4 space-y-1 mt-1">
+                <router-link to="/ventes/dashboard" class="nav-sublink" active-class="active">
+                  Dashboard
+                </router-link>
                 <router-link to="/ventes/demandes-client" class="nav-sublink" active-class="active">
                   Demandes d'achat client
                 </router-link>
@@ -126,6 +132,9 @@
                 </svg>
               </button>
               <div v-show="openMenus.stock" class="pl-4 space-y-1 mt-1">
+                <router-link to="/stock/dashboard" class="nav-sublink" active-class="active">
+                  Dashboard
+                </router-link>
                 <router-link to="/stock/valorisation" class="nav-sublink" active-class="active">
                   Valorisation des stocks
                 </router-link>
