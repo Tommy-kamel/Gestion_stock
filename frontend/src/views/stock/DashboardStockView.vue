@@ -58,7 +58,7 @@
             </div>
           </div>
 
-          <div class="bg-white rounded-lg shadow-md p-6">
+          <!-- <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm text-gray-600 mb-1">Valeur Totale</p>
@@ -70,7 +70,7 @@
                 </svg>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- Alerte rupture -->
@@ -186,7 +186,7 @@ const fetchStats = async () => {
 }
 
 const formatMoney = (value) => {
-  return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(value || 0)
+  return new Intl.NumberFormat('fr-MG', { style: 'currency', currency: 'MGA' }).format(value || 0)
 }
 
 const formatDate = (date) => {

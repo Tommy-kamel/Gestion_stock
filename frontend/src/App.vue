@@ -42,6 +42,44 @@
               <span>Tableau de bord</span>
             </router-link>
 
+            <!-- Module STOCK -->
+            <div class="pt-2">
+              <button 
+                @click="toggleMenu('stock')"
+                class="nav-section-header"
+              >
+                <div class="flex items-center">
+                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                  <span>Stock</span>
+                </div>
+                <svg :class="['w-4 h-4 transition-transform', openMenus.stock ? 'rotate-180' : '']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div v-show="openMenus.stock" class="pl-4 space-y-1 mt-1">
+                <router-link to="/stock/dashboard" class="nav-sublink" active-class="active">
+                  Dashboard
+                </router-link>
+                <router-link to="/stock/valorisation" class="nav-sublink" active-class="active">
+                  Valorisation des stocks
+                </router-link>
+                <router-link to="/stock/mouvements" class="nav-sublink" active-class="active">
+                  Mouvements
+                </router-link>
+                <!-- <router-link to="/stock/articles" class="nav-sublink" active-class="active">
+                  Articles
+                </router-link> -->
+                <!-- <router-link to="/stock/lots" class="nav-sublink" active-class="active">
+                  Lots
+                </router-link> -->
+                <!-- <router-link to="/stock/depots" class="nav-sublink" active-class="active">
+                  Dépôts
+                </router-link> -->
+              </div>
+            </div>
+
             <!-- Module ACHATS -->
             <div class="pt-4">
               <button 
@@ -111,44 +149,6 @@
                 </router-link>
                 <router-link to="/ventes/factures" class="nav-sublink" active-class="active">
                   Factures clients
-                </router-link> -->
-              </div>
-            </div>
-
-            <!-- Module STOCK -->
-            <div class="pt-2">
-              <button 
-                @click="toggleMenu('stock')"
-                class="nav-section-header"
-              >
-                <div class="flex items-center">
-                  <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                  <span>Stock</span>
-                </div>
-                <svg :class="['w-4 h-4 transition-transform', openMenus.stock ? 'rotate-180' : '']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-              <div v-show="openMenus.stock" class="pl-4 space-y-1 mt-1">
-                <router-link to="/stock/dashboard" class="nav-sublink" active-class="active">
-                  Dashboard
-                </router-link>
-                <router-link to="/stock/valorisation" class="nav-sublink" active-class="active">
-                  Valorisation des stocks
-                </router-link>
-                <router-link to="/stock/mouvements" class="nav-sublink" active-class="active">
-                  Mouvements
-                </router-link>
-                <!-- <router-link to="/stock/articles" class="nav-sublink" active-class="active">
-                  Articles
-                </router-link> -->
-                <!-- <router-link to="/stock/lots" class="nav-sublink" active-class="active">
-                  Lots
-                </router-link> -->
-                <!-- <router-link to="/stock/depots" class="nav-sublink" active-class="active">
-                  Dépôts
                 </router-link> -->
               </div>
             </div>
