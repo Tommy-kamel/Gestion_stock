@@ -11,9 +11,34 @@ export const useChatbotStore = defineStore('chatbot', () => {
   const messages = ref([])
   const isLoading = ref(false)
   const error = ref(null)
+  const availableEndpoints = ref(null)
+
+  // Récupérer la liste des endpoints disponibles depuis le backend
+  const fetchAvailableEndpoints = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.get(`${API_BASE_URL}/api/meta/endpoints`, {
+        headers: {
+          'Authorization': token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json'
+        }
+      })
+      availableEndpoints.value = response.data
+      console.log('Endpoints disponibles chargés:', availableEndpoints.value)
+      return response.data
+    } catch (error) {
+      console.error('Erreur chargement endpoints:', error)
+      return null
+    }
+  }
 
   // Message de bienvenue initial
-  const initializeChat = () => {
+  const initializeChat = async () => {
+    // Charger les endpoints disponibles au démarrage
+    if (!availableEndpoints.value) {
+      await fetchAvailableEndpoints()
+    }
+    
     if (messages.value.length === 0) {
       messages.value.push({
         id: Date.now(),
@@ -91,12 +116,34 @@ export const useChatbotStore = defineStore('chatbot', () => {
     isLoading.value = true
 
     try {
+      // Charger les endpoints si pas encore fait
+      if (!availableEndpoints.value) {
+        await fetchAvailableEndpoints()
+      }
+
+      // Construire le contexte des endpoints disponibles
+      const endpointsContext = availableEndpoints.value 
+        ? Object.entries(availableEndpoints.value)
+            .map(([module, endpoints]) => {
+              const endpointsList = endpoints
+                .map(e => `  - ${e.method} ${e.path} - ${e.description}`)
+                .join('\n')
+              return `\n**${module.toUpperCase()}:**\n${endpointsList}`
+            })
+            .join('\n')
+        : 'Endpoints non disponibles'
+
       // ÉTAPE 1: Demander à Gemini quels endpoints appeler
       const analysisPrompt = `Question utilisateur: "${messageText}"
+
+Voici les endpoints API disponibles dans le système:
+${endpointsContext}
 
 Analyse cette question et réponds UNIQUEMENT avec un JSON valide (pas de markdown, pas de texte avant/après):
 - Si la question porte sur des DONNÉES réelles du système → {"needsData": true, "endpoints": ["liste des endpoints"], "explanation": "pourquoi"}
 - Si la question porte sur le PROCESSUS/AIDE → {"needsData": false, "response": "ta réponse complète ici"}
+
+IMPORTANT: Utilise UNIQUEMENT les endpoints listés ci-dessus. Choisis ceux qui sont pertinents pour répondre à la question.
 
 Exemple 1: "Il y a combien de proformas fournisseur ?"
 {"needsData": true, "endpoints": ["/api/achats/proformas"], "explanation": "Pour compter les proformas fournisseurs"}

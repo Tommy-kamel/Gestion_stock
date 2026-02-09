@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-pro:generateContent'
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent'
 
 // Contexte système sur l'ERP pour que le chatbot comprenne le système
 const ERP_CONTEXT = `
@@ -48,99 +48,22 @@ Tu es un assistant intelligent pour un système ERP de gestion de stock.
 - Synthèse: Dashboard global
 - Validations: Approbation des demandes d'achat et proformas
 
-## ENDPOINTS API DISPONIBLES:
+## INSTRUCTIONS:
 
-Quand l'utilisateur pose une question sur des données, tu DOIS répondre avec un JSON contenant les endpoints à appeler.
+Quand l'utilisateur pose une question sur des données, tu recevras la liste des endpoints API disponibles.
+Tu dois choisir les endpoints pertinents et répondre avec un JSON:
 
-Format de réponse attendu:
 {
   "needsData": true,
   "endpoints": ["endpoint1", "endpoint2"],
-  "explanation": "Courte explication de pourquoi ces endpoints"
+  "explanation": "Courte explication"
 }
 
-### ACHATS:
-- GET /api/achats/demandes - Liste toutes les demandes d'achat
-- GET /api/achats/proformas - Liste tous les proformas fournisseurs
-- GET /api/achats/bons-commande - Liste tous les bons de commande achat
-- GET /api/achats/offres-fournisseur - Liste toutes les offres fournisseurs
-
-### VENTES:
-- GET /api/ventes/demandes-client - Liste toutes les demandes clients
-- GET /api/ventes/proformas - Liste tous les proformas vente
-- GET /api/ventes/proformas/valides - Proformas vente validés
-- GET /api/ventes/bons-commande - Liste tous les bons de commande vente
-
-### STOCK:
-- GET /api/stock/valorisation - État du stock valorisé (tous les mouvements avec quantités et valeurs)
-- GET /api/stock/articles - Liste tous les articles du catalogue
-- GET /api/stock/depots - Liste tous les dépôts d'entreposage
-
-### RÉFÉRENTIEL:
-- GET /api/references/entreprises - Liste toutes les entreprises
-- GET /api/references/sites - Liste tous les sites
-- GET /api/references/fournisseurs - Liste tous les fournisseurs
-- GET /api/references/entreprises/clients - Liste tous les clients
-
-### FINANCES:
-- GET /api/finances/caisses - Liste toutes les caisses avec soldes
-- GET /api/finances/paiements-achat - Liste tous les paiements fournisseurs
-- GET /api/finances/paiements-vente - Liste tous les paiements clients
-
-## EXEMPLES D'UTILISATION:
-
-Question: "Il y a combien de proformas fournisseur ?"
-Réponse attendue:
-{
-  "needsData": true,
-  "endpoints": ["/api/achats/proformas"],
-  "explanation": "Pour compter les proformas fournisseurs"
-}
-
-Question: "Quel est l'état du stock ?"
-Réponse attendue:
-{
-  "needsData": true,
-  "endpoints": ["/api/stock/valorisation"],
-  "explanation": "Pour voir les mouvements et quantités en stock"
-}
-
-Question: "Quelle est la valeur totale du stock ?"
-Réponse attendue:
-{
-  "needsData": true,
-  "endpoints": ["/api/stock/valorisation"],
-  "explanation": "Pour calculer la valorisation du stock"
-}
-
-Question: "Combien d'articles dans le catalogue ?"
-Réponse attendue:
-{
-  "needsData": true,
-  "endpoints": ["/api/stock/articles"],
-  "explanation": "Pour compter les articles"
-}
-
-Question: "Combien de clients et fournisseurs ?"
-Réponse attendue:
-{
-  "needsData": true,
-  "endpoints": ["/api/references/entreprises/clients", "/api/references/fournisseurs"],
-  "explanation": "Pour compter clients et fournisseurs"
-}
-
-Question: "Comment créer une DA ?" (question sur le processus, pas les données)
-Réponse attendue:
+Si la question porte sur le processus/aide (pas sur des données):
 {
   "needsData": false,
-  "response": "Pour créer une Demande d'Achat : 1. Menu Achats..."
+  "response": "Ta réponse complète ici"
 }
-
-RÈGLES IMPORTANTES:
-- Si la question porte sur des DONNÉES (combien, liste, montants, etc.) → needsData: true
-- Si la question porte sur le PROCESSUS/AIDE → needsData: false et donne la réponse directement
-- Toujours inclure le préfixe /api/ dans les endpoints
-- Si plusieurs données sont nécessaires, liste tous les endpoints
 
 Réponds de manière claire, précise et professionnelle en français.
 `
